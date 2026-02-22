@@ -361,16 +361,16 @@ const Checkout = () => {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Full Name</label>
-                    <input type="text" name="fullName" value={contactInfo.fullName} readOnly style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }} placeholder="John Doe" required />
+                    <input type="text" name="fullName" value={contactInfo.fullName} readOnly className="checkout-readonly" placeholder="John Doe" required />
                   </div>
                   <div className="form-group">
                     <label>Email Address</label>
-                    <input type="email" name="email" value={contactInfo.email} readOnly style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }} placeholder="john@example.com" required />
+                    <input type="email" name="email" value={contactInfo.email} readOnly className="checkout-readonly" placeholder="john@example.com" required />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Phone Number</label>
-                  <input type="tel" name="phone" value={contactInfo.phone} readOnly style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }} placeholder="01712345678" required />
+                  <input type="tel" name="phone" value={contactInfo.phone} readOnly className="checkout-readonly" placeholder="01712345678" required />
                 </div>
               </form>
             </div>

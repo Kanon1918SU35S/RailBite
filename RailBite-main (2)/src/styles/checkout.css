@@ -27,6 +27,21 @@
   color: var(--text-white);
 }
 
+/* ── Read-only contact fields ── */
+.checkout-readonly {
+  background: var(--dark-lighter) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-gray) !important;
+  cursor: not-allowed !important;
+  opacity: 0.75;
+}
+
+.checkout-readonly:focus {
+  outline: none !important;
+  border-color: var(--border-dark) !important;
+  box-shadow: none !important;
+}
+
 /* ── Payment Method Cards ── */
 .payment-methods {
   display: grid;
