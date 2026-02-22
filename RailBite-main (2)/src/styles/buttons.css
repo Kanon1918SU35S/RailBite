@@ -1,0 +1,182 @@
+/* RAILBITE BD - BUTTONS */
+/* All Button Styles and Variants */
+
+.btn {
+  display: inline-block;
+  padding: 0.85rem 2.2rem;
+  border-radius: 30px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: var(--primary-orange);
+  color: var(--text-white);
+  box-shadow: var(--shadow-orange);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  background: var(--orange-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 30px rgba(255, 140, 66, 0.6);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.btn-white {
+  background: var(--text-white);
+  color: var(--dark-bg);
+  font-weight: 700;
+}
+
+.btn-white:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+}
+
+.btn-large {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+.btn-sm {
+  padding: 0.6rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-block {
+  width: 100%;
+  display: block;
+}
+
+.btn-logout {
+  padding: 0.7rem 1.8rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(232, 126, 30, 0.4);
+}
+
+.btn-explore {
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 1px solid var(--primary-orange);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-explore:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.btn-view-details {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 1px solid var(--primary-orange);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-view-details:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.btn-view-all {
+  width: 100%;
+  padding: 1rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 1px solid var(--primary-orange);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-view-all:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.btn-reorder {
+  padding: 0.6rem 1.5rem;
+  background: var(--primary-orange);
+  color: var(--text-white);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-reorder:hover {
+  background: var(--orange-hover);
+  transform: translateY(-2px);
+}
+
+.btn-view-receipt {
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 1px solid var(--primary-orange);
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-view-receipt:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}

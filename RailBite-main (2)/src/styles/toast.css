@@ -1,0 +1,135 @@
+/* ============================================
+   RAILBITE BD - TOAST NOTIFICATIONS
+   Modern toast with icon, progress bar & exit
+   ============================================ */
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--success);
+  color: var(--text-white);
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* modern variant */
+.toast--modern {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  overflow: hidden;
+  min-width: 260px;
+  max-width: 380px;
+  animation: toastEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast--modern.success {
+  background: rgba(34, 197, 94, 0.92);
+}
+
+.toast--modern.error {
+  background: rgba(239, 68, 68, 0.92);
+}
+
+.toast--modern.warning {
+  background: rgba(245, 158, 11, 0.92);
+}
+
+.toast--modern.info {
+  background: rgba(232, 126, 30, 0.92);
+}
+
+/* icon */
+.toast__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* message */
+.toast__msg {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* auto-close progress bar */
+.toast__progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0 0 14px 14px;
+  animation: toastProgress 3s linear forwards;
+}
+
+/* enter */
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(80px) scale(0.85);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* exit */
+.toast--exit {
+  animation: toastExit 0.35s ease forwards !important;
+}
+
+@keyframes toastExit {
+  to {
+    opacity: 0;
+    transform: translateX(80px) scale(0.85);
+  }
+}
+
+/* progress countdown */
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+/* legacy animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.error {
+  background: var(--danger);
+}
+
+.toast.warning {
+  background: var(--warning);
+}
+
+.toast.info {
+  background: var(--primary-orange);
+}

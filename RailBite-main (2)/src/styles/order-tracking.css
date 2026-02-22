@@ -1,0 +1,375 @@
+/* RAILBITE BD - ORDER TRACKING PAGE */
+
+.order-tracking-page {
+  padding: 80px 0;
+  min-height: 70vh;
+}
+
+/* Header */
+
+.tracking-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.tracking-header h1 {
+  font-size: 2rem;
+  color: var(--text-white);
+  margin-bottom: 0.4rem;
+}
+
+.tracking-order-id {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+}
+
+.tracking-order-id strong {
+  color: var(--primary-orange);
+}
+
+.tracking-order-date {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+/* Progress card */
+
+.tracking-progress-card {
+  background: var(--dark-card);
+  padding: 1.6rem 1.4rem;
+  border-radius: 15px;
+  border: 1px solid var(--border-dark);
+  margin-bottom: 2rem;
+}
+
+.tracking-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.tracking-progress-header h3 {
+  color: var(--text-white);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.tracking-progress-percent {
+  color: var(--primary-orange);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.tracking-progress-bar {
+  width: 100%;
+  height: 12px;
+  background: var(--dark-lighter);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+}
+
+.tracking-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--primary-orange) 0%,
+    var(--orange-hover) 100%
+  );
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+.tracking-estimated {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.tracking-estimated strong {
+  color: var(--primary-orange);
+}
+
+/* Main layout */
+
+.tracking-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1.8rem;
+}
+
+/* Timeline */
+
+.order-status-timeline {
+  background: var(--dark-card);
+  border-radius: 15px;
+  border: 1px solid var(--border-dark);
+  padding: 1.5rem 1.4rem;
+}
+
+.tracking-section-title {
+  color: var(--text-white);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.timeline-step + .timeline-step {
+  margin-top: 1.4rem;
+}
+
+.timeline-icon-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--dark-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 2px solid var(--border-dark);
+}
+
+.timeline-line {
+  width: 3px;
+  flex: 1;
+  margin-top: 4px;
+  background: var(--border-dark);
+}
+
+.timeline-line.completed {
+  background: var(--primary-orange);
+}
+
+.timeline-step.completed .timeline-icon {
+  border-color: var(--primary-orange);
+  background: rgba(255, 140, 66, 0.15);
+}
+
+.timeline-step.active .timeline-icon {
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.2);
+}
+
+.timeline-content h4 {
+  color: var(--text-white);
+  font-size: 1rem;
+  margin: 0 0 0.3rem;
+}
+
+.timeline-description {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.timeline-status-current {
+  color: var(--primary-orange);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.timeline-status-done {
+  color: var(--success);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Details column */
+
+.tracking-details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-details-card {
+  background: var(--dark-card);
+  border-radius: 15px;
+  border: 1px solid var(--border-dark);
+  padding: 1.5rem 1.4rem;
+}
+
+.order-details-card h3 {
+  color: var(--text-white);
+  font-size: 1.05rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Delivery partner */
+
+.delivery-partner-card {
+  background: var(--dark-lighter);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.delivery-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--primary-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.delivery-info h4 {
+  color: var(--text-white);
+  margin: 0 0 0.3rem;
+}
+
+.delivery-info p {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  margin: 0 0 0.7rem;
+}
+
+/* Detail rows */
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.detail-row span {
+  color: var(--text-gray);
+}
+
+.detail-row strong {
+  color: var(--text-white);
+}
+
+.detail-address {
+  max-width: 60%;
+  text-align: right;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.detail-total-row {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.detail-total-row span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.detail-total-amount {
+  font-size: 1.25rem;
+  color: var(--primary-orange);
+}
+
+/* Items list */
+
+.order-details-card .order-items-list {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-dark);
+  padding-top: 0.9rem;
+}
+
+.order-details-card .order-items-list h4 {
+  color: var(--text-white);
+  font-size: 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.order-details-card .order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+/* Actions */
+
+.tracking-actions {
+  margin-top: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tracking-cancel-btn {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Empty state reused from order history */
+
+.empty-cart {
+  max-width: 480px;
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.empty-cart-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-cart h2 {
+  color: var(--text-white);
+  margin-bottom: 0.4rem;
+}
+
+.empty-cart p {
+  color: var(--text-gray);
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .tracking-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .tracking-progress-card {
+    padding: 1.3rem 1.1rem;
+  }
+
+  .order-status-timeline,
+  .order-details-card {
+    padding: 1.3rem 1.1rem;
+  }
+
+  .detail-address {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}

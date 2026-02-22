@@ -1,0 +1,537 @@
+/* RAILBITE BD – FOOD CAROUSEL (On-Click 3D Carousel) */
+
+/* ─── Container ──────────────────────────── */
+.food-carousel {
+    position: relative;
+    width: 100%;
+    padding: 3rem 0 2rem;
+    perspective: 1200px;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ─── Track (holds all visible cards) ────── */
+.food-carousel__track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 440px;
+    /* enough for the tallest card */
+    transform-style: preserve-3d;
+}
+
+/* ─── Single Card Base ───────────────────── */
+.food-carousel__card {
+    position: absolute;
+    width: 300px;
+    background: var(--dark-card);
+    border: 1px solid var(--border-dark);
+    border-radius: 22px;
+    overflow: hidden;
+    transition:
+        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+}
+
+/* ─── Position variants ──────────────────── */
+
+/* Centre (active) */
+.food-carousel__card--pos0 {
+    z-index: 5;
+    transform: translateX(0) scale(1) rotateY(0deg);
+    opacity: 1;
+    filter: brightness(1);
+    border-color: var(--primary-orange);
+    box-shadow:
+        0 20px 60px rgba(232, 126, 30, 0.35),
+        0 0 30px rgba(232, 126, 30, 0.15);
+}
+
+/* 1 to the left */
+.food-carousel__card--posn1 {
+    z-index: 4;
+    transform: translateX(-320px) scale(0.85) rotateY(25deg);
+    opacity: 0.75;
+    filter: brightness(0.7);
+}
+
+/* 2 to the left */
+.food-carousel__card--posn2 {
+    z-index: 3;
+    transform: translateX(-560px) scale(0.7) rotateY(35deg);
+    opacity: 0.4;
+    filter: brightness(0.5);
+}
+
+/* 1 to the right */
+.food-carousel__card--pos1 {
+    z-index: 4;
+    transform: translateX(320px) scale(0.85) rotateY(-25deg);
+    opacity: 0.75;
+    filter: brightness(0.7);
+}
+
+/* 2 to the right */
+.food-carousel__card--pos2 {
+    z-index: 3;
+    transform: translateX(560px) scale(0.7) rotateY(-35deg);
+    opacity: 0.4;
+    filter: brightness(0.5);
+}
+
+/* Hover glow on side cards */
+.food-carousel__card--posn1:hover,
+.food-carousel__card--pos1:hover {
+    filter: brightness(0.85);
+    box-shadow: 0 10px 30px rgba(232, 126, 30, 0.2);
+}
+
+/* ─── Image ──────────────────────────────── */
+.food-carousel__img-wrap {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: var(--dark-lighter);
+}
+
+.food-carousel__img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.food-carousel__card--pos0 .food-carousel__img-wrap img {
+    transform: scale(1.05);
+}
+
+.food-carousel__card--pos0:hover .food-carousel__img-wrap img {
+    transform: scale(1.12) rotate(1deg);
+}
+
+.food-carousel__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* ─── Info ────────────────────────────────── */
+.food-carousel__info {
+    padding: 1.2rem 1.4rem 1.4rem;
+    text-align: center;
+}
+
+.food-carousel__name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.food-carousel__desc {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin-bottom: 0.5rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.food-carousel__category {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--primary-orange);
+    background: rgba(232, 126, 30, 0.12);
+    border: 1px solid rgba(232, 126, 30, 0.25);
+    border-radius: 30px;
+    padding: 3px 12px;
+    margin-bottom: 0.6rem;
+}
+
+.food-carousel__price {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary-orange);
+    margin: 0.5rem 0 0.8rem;
+}
+
+.food-carousel__actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    animation: carouselFadeUp 0.45s 0.15s both;
+}
+
+/* ─── Arrows ─────────────────────────────── */
+.food-carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 52px;
+    height: 52px;
+    border: 2px solid var(--border-orange);
+    border-radius: 50%;
+    background: rgba(10, 15, 20, 0.85);
+    color: var(--primary-orange);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: var(--transition-bounce);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.food-carousel__arrow--left {
+    left: 12px;
+}
+
+.food-carousel__arrow--right {
+    right: 12px;
+}
+
+.food-carousel__arrow:hover {
+    background: var(--primary-orange);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(232, 126, 30, 0.6);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.food-carousel__arrow:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+/* ─── Dot indicators ─────────────────────── */
+.food-carousel__dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1.5rem;
+}
+
+.food-carousel__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--border-orange);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    padding: 0;
+}
+
+.food-carousel__dot--active {
+    background: var(--primary-orange);
+    border-color: var(--primary-orange);
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(232, 126, 30, 0.6);
+}
+
+.food-carousel__dot:hover:not(.food-carousel__dot--active) {
+    background: rgba(232, 126, 30, 0.35);
+}
+
+/* ─── Entrance animation for action buttons ─ */
+@keyframes carouselFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Click pulse on arrows ──────────────── */
+.food-carousel__arrow::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-orange);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.food-carousel__arrow:active::after {
+    inset: -14px;
+    opacity: 0.5;
+}
+
+/* ─── Slide Animations (Going RIGHT / Next) ─ */
+/* Center card slides in from pos1 (right) */
+.food-carousel--right .food-carousel__card--pos0 {
+    animation: fc-r-to-center 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-r-to-center {
+    from {
+        transform: translateX(320px) scale(0.85) rotateY(-25deg);
+        opacity: 0.75;
+        filter: brightness(0.7);
+    }
+}
+
+/* Left-1 card slides in from center (pos0) */
+.food-carousel--right .food-carousel__card--posn1 {
+    animation: fc-r-center-to-left1 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-r-center-to-left1 {
+    from {
+        transform: translateX(0) scale(1) rotateY(0deg);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* Left-2 card slides in from posn1 */
+.food-carousel--right .food-carousel__card--posn2 {
+    animation: fc-r-left1-to-left2 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-r-left1-to-left2 {
+    from {
+        transform: translateX(-320px) scale(0.85) rotateY(25deg);
+        opacity: 0.75;
+        filter: brightness(0.7);
+    }
+}
+
+/* Right-1 card slides in from pos2 */
+.food-carousel--right .food-carousel__card--pos1 {
+    animation: fc-r-right2-to-right1 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-r-right2-to-right1 {
+    from {
+        transform: translateX(560px) scale(0.7) rotateY(-35deg);
+        opacity: 0.4;
+        filter: brightness(0.5);
+    }
+}
+
+/* Right-2 card enters from far right */
+.food-carousel--right .food-carousel__card--pos2 {
+    animation: fc-r-enter-right2 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-r-enter-right2 {
+    from {
+        transform: translateX(800px) scale(0.55) rotateY(-45deg);
+        opacity: 0;
+    }
+}
+
+/* ─── Slide Animations (Going LEFT / Prev) ── */
+/* Center card slides in from posn1 (left) */
+.food-carousel--left .food-carousel__card--pos0 {
+    animation: fc-l-to-center 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-l-to-center {
+    from {
+        transform: translateX(-320px) scale(0.85) rotateY(25deg);
+        opacity: 0.75;
+        filter: brightness(0.7);
+    }
+}
+
+/* Right-1 card slides in from center (pos0) */
+.food-carousel--left .food-carousel__card--pos1 {
+    animation: fc-l-center-to-right1 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-l-center-to-right1 {
+    from {
+        transform: translateX(0) scale(1) rotateY(0deg);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* Right-2 card slides in from pos1 */
+.food-carousel--left .food-carousel__card--pos2 {
+    animation: fc-l-right1-to-right2 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-l-right1-to-right2 {
+    from {
+        transform: translateX(320px) scale(0.85) rotateY(-25deg);
+        opacity: 0.75;
+        filter: brightness(0.7);
+    }
+}
+
+/* Left-1 card slides in from posn2 */
+.food-carousel--left .food-carousel__card--posn1 {
+    animation: fc-l-left2-to-left1 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-l-left2-to-left1 {
+    from {
+        transform: translateX(-560px) scale(0.7) rotateY(35deg);
+        opacity: 0.4;
+        filter: brightness(0.5);
+    }
+}
+
+/* Left-2 card enters from far left */
+.food-carousel--left .food-carousel__card--posn2 {
+    animation: fc-l-enter-left2 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fc-l-enter-left2 {
+    from {
+        transform: translateX(-800px) scale(0.55) rotateY(45deg);
+        opacity: 0;
+    }
+}
+
+/* ─── Center card content reveal on transition ─ */
+.food-carousel--right .food-carousel__card--pos0 .food-carousel__img-wrap img,
+.food-carousel--left .food-carousel__card--pos0 .food-carousel__img-wrap img {
+    animation: fc-img-reveal 0.5s 0.1s ease both;
+}
+
+@keyframes fc-img-reveal {
+    from {
+        opacity: 0.6;
+        transform: scale(1.18);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.food-carousel--right .food-carousel__card--pos0 .food-carousel__info,
+.food-carousel--left .food-carousel__card--pos0 .food-carousel__info {
+    animation: fc-info-reveal 0.45s 0.15s ease both;
+}
+
+@keyframes fc-info-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Responsive ─────────────────────────── */
+@media (max-width: 1100px) {
+    .food-carousel__card {
+        width: 260px;
+    }
+
+    .food-carousel__card--posn1 {
+        transform: translateX(-280px) scale(0.82) rotateY(22deg);
+    }
+
+    .food-carousel__card--pos1 {
+        transform: translateX(280px) scale(0.82) rotateY(-22deg);
+    }
+
+    .food-carousel__card--posn2 {
+        transform: translateX(-480px) scale(0.65) rotateY(30deg);
+        opacity: 0.25;
+    }
+
+    .food-carousel__card--pos2 {
+        transform: translateX(480px) scale(0.65) rotateY(-30deg);
+        opacity: 0.25;
+    }
+}
+
+@media (max-width: 768px) {
+    .food-carousel__track {
+        height: 400px;
+    }
+
+    .food-carousel__card {
+        width: 240px;
+    }
+
+    .food-carousel__card--posn1 {
+        transform: translateX(-210px) scale(0.78) rotateY(18deg);
+    }
+
+    .food-carousel__card--pos1 {
+        transform: translateX(210px) scale(0.78) rotateY(-18deg);
+    }
+
+    .food-carousel__card--posn2,
+    .food-carousel__card--pos2 {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .food-carousel__arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+
+    .food-carousel__arrow--left {
+        left: 4px;
+    }
+
+    .food-carousel__arrow--right {
+        right: 4px;
+    }
+}
+
+@media (max-width: 520px) {
+    .food-carousel__track {
+        height: 370px;
+    }
+
+    .food-carousel__card {
+        width: 220px;
+    }
+
+    .food-carousel__card--posn1 {
+        transform: translateX(-170px) scale(0.72) rotateY(15deg);
+        opacity: 0.55;
+    }
+
+    .food-carousel__card--pos1 {
+        transform: translateX(170px) scale(0.72) rotateY(-15deg);
+        opacity: 0.55;
+    }
+
+    .food-carousel__img-wrap {
+        height: 160px;
+    }
+
+    .food-carousel__price {
+        font-size: 1.3rem;
+    }
+}

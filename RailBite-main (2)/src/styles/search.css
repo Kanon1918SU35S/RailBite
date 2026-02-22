@@ -1,0 +1,225 @@
+/* =====================================================
+   SEARCH BAR - PROFESSIONAL STYLING
+   ===================================================== */
+
+.search-filter-container {
+  background: var(--dark-card);
+  padding: 2rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Search Bar Wrapper */
+.search-bar {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Search Icon */
+.search-icon {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  color: var(--text-gray);
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+/* Search Input */
+.search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3.5rem;
+  background: var(--dark-input);
+  border: 2px solid var(--border-dark);
+  border-radius: 50px;
+  color: var(--text-white);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-weight: 500;
+}
+
+/* Search Input Placeholder */
+.search-input::placeholder {
+  color: var(--text-light-gray);
+}
+
+/* Search Input Focus State */
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.05);
+  box-shadow: 0 0 0 4px rgba(232, 126, 30, 0.2), 
+              inset 0 0 20px rgba(232, 126, 30, 0.1);
+}
+
+/* Search Icon Color on Focus */
+.search-input:focus ~ .search-icon {
+  color: var(--primary-orange);
+}
+
+/* Search Input Hover State */
+.search-input:hover {
+  border-color: rgba(232, 126, 30, 0.5);
+  background: var(--dark-input);
+}
+
+/* =====================================================
+   FILTER CONTROLS
+   ===================================================== */
+
+.filter-controls {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* Filter Group */
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Filter Label */
+.filter-group label {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--text-white);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Filter Select Dropdown */
+.filter-group select {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: var(--dark-input);
+  border: 2px solid var(--border-dark);
+  border-radius: 12px;
+  color: var(--text-white);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23e87e1e" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1.5rem;
+  padding-right: 2.8rem;
+}
+
+/* Filter Select Option */
+.filter-group select option {
+  background: var(--dark-card);
+  color: var(--text-white);
+  padding: 0.8rem;
+}
+
+/* Filter Select Focus State */
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 4px rgba(232, 126, 30, 0.2);
+  background-color: rgba(232, 126, 30, 0.05);
+}
+
+/* Filter Select Hover State */
+.filter-group select:hover {
+  border-color: rgba(232, 126, 30, 0.5);
+  background-color: var(--dark-input);
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .search-filter-container {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 15px;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filter-group {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .search-input {
+    padding: 0.9rem 1rem 0.9rem 3.2rem;
+    font-size: 1rem;
+  }
+
+  .filter-group select {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .search-filter-container {
+    padding: 1.2rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-bar {
+    margin-bottom: 1rem;
+  }
+
+  .search-input {
+    padding: 0.8rem 1rem 0.8rem 3rem;
+    border-radius: 40px;
+    font-size: 0.95rem;
+  }
+
+  .search-icon {
+    font-size: 1.1rem;
+    left: 1.2rem;
+  }
+
+  .filter-group label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-group select {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+}
+
+/* =====================================================
+   ACCESSIBILITY & ANIMATION
+   ===================================================== */
+
+.search-input:active,
+.filter-group select:active {
+  transform: scale(0.98);
+}
+
+/* Smooth transition for all interactive elements */
+.search-input,
+.filter-group select {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disabled state */
+.search-input:disabled,
+.filter-group select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

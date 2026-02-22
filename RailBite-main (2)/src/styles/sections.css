@@ -1,0 +1,104 @@
+/* RAILBITE BD - SECTIONS */
+/* Common Section Styles, Titles, How It Works */
+
+.section-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.section-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-gray);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+/* How It Works Section */
+.how-it-works {
+  padding: 100px 0;
+  background: var(--dark-bg);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+}
+
+.step-card {
+  background: rgba(10, 15, 20, 0.8);
+  padding: 2.5rem;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 140, 66, 0.1);
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.step-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary-orange);
+  box-shadow: var(--shadow-orange);
+}
+
+.step-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.step-card h3 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.step-card p {
+  color: var(--text-gray);
+  line-height: 1.7;
+}
+
+/* Featured Menu Section */
+.featured-menu {
+  padding: 100px 0;
+  background: var(--dark-bg);
+}
+
+.menu-category-badges {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.category-badge {
+  background: rgba(255, 140, 66, 0.2);
+  color: var(--primary-orange);
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  border: 1px solid var(--primary-orange);
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 100px 0;
+  background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-hover) 100%);
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--text-white);
+}

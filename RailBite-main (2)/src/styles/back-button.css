@@ -1,0 +1,61 @@
+/* RAILBITE BD - BACK BUTTON */
+/* Fixed Back Button Component */
+
+.back-button-fixed {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: rgba(26, 26, 26, 0.95);
+  color: var(--text-gray);
+  border: 1px solid var(--border-dark);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+}
+
+.back-button-fixed:hover {
+  background: var(--dark-card);
+  color: var(--primary-orange);
+  border-color: var(--primary-orange);
+  transform: translateX(-3px);
+}
+
+.back-button-fixed .arrow {
+  font-size: 1.2rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.back-btn:hover {
+  color: var(--primary-orange);
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.back-link:hover {
+  color: var(--primary-orange);
+}

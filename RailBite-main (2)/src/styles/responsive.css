@@ -1,0 +1,168 @@
+/* RAILBITE BD - RESPONSIVE DESIGN */
+/* Media Queries for Different Screen Sizes */
+
+/* Tablet & Small Desktop (max-width: 968px) */
+@media (max-width: 968px) {
+  .nav-menu {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .hero-main-title {
+    font-size: 2.5rem;
+  }
+
+  .cart-container {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-container {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-container {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-grid-bordered {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-card-bordered {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .menu-card-image {
+    width: 100%;
+    height: 250px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .selection-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .selection-title {
+    font-size: 2.2rem;
+  }
+
+  .selection-card {
+    padding: 2.5rem 2rem;
+  }
+
+  .selection-icon {
+    width: 100px;
+    height: 100px;
+    font-size: 3rem;
+  }
+
+  .selection-card h3 {
+    font-size: 1.6rem;
+  }
+}
+
+/* Tablet Portrait (max-width: 768px) */
+@media (max-width: 768px) {
+  .tracking-container {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Mobile (max-width: 576px) */
+@media (max-width: 576px) {
+  .hero-main-title {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .food-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .selection-title {
+    font-size: 1.8rem;
+  }
+
+  .selection-subtitle {
+    font-size: 1rem;
+  }
+
+  .selection-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .selection-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+  }
+
+  .selection-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .selection-card p {
+    font-size: 0.95rem;
+  }
+
+  .order-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .order-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .order-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,328 @@
+/* RAILBITE BD - CART PAGE */
+/* Shopping Cart Layout and Components */
+
+.cart-page {
+  min-height: 70vh;
+  padding: 80px 0;
+}
+
+.cart-header {
+  margin-bottom: 2rem;
+}
+
+.cart-header h1 {
+  font-size: 2.5rem;
+  color: var(--text-white);
+}
+
+.cart-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.cart-items {
+  background: var(--dark-card);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-dark);
+}
+
+.cart-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-dark);
+  align-items: center;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.item-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  background: var(--dark-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.item-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+  margin-bottom: 1rem;
+}
+
+.item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qty-btn {
+  width: 35px;
+  height: 35px;
+  border: none;
+  background: var(--dark-lighter);
+  color: var(--primary-orange);
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.qty-btn:hover {
+  background: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.qty-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform 0.3s;
+}
+
+.remove-btn:hover {
+  transform: scale(1.2);
+}
+
+.cart-summary {
+  background: var(--dark-card);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-dark);
+  height: fit-content;
+}
+
+.cart-summary h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-white);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-dark);
+  color: var(--text-gray);
+}
+
+.summary-row:last-of-type {
+  border-bottom: none;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border-dark);
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--dark-card);
+  border-radius: 20px;
+  border: 1px solid var(--border-dark);
+}
+
+.empty-cart-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-cart h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.empty-cart p {
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+}
+
+/* ============================================
+   CART MICRO-INTERACTIONS & ANIMATIONS
+   ============================================ */
+
+/* staggered entrance for cart items */
+.cart-item--animated {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cartItemIn 0.45s ease forwards;
+}
+
+@keyframes cartItemIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* removal slide-out */
+.cart-item--removing {
+  animation: cartItemOut 0.4s ease forwards !important;
+}
+
+@keyframes cartItemOut {
+  to {
+    opacity: 0;
+    transform: translateX(60px) scale(0.9);
+  }
+}
+
+/* qty button press effect */
+.qty-btn--animated {
+  transition: all 0.2s;
+}
+
+.qty-btn--animated:active {
+  transform: scale(0.85);
+}
+
+/* qty value pop */
+.qty-value--pop {
+  animation: qtyPop 0.3s ease;
+}
+
+@keyframes qtyPop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.35);
+    color: var(--primary-orange);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* remove button hover glow */
+.remove-btn--animated {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid transparent;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.remove-btn--animated:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  transform: scale(1.1);
+}
+
+/* summary slide-in */
+.cart-summary--animated {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cartSummaryIn 0.5s ease 0.25s forwards;
+}
+
+@keyframes cartSummaryIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* animated empty cart */
+.cart-empty--animated .cart-empty__icon {
+  margin-bottom: 1.5rem;
+  animation: emptyFloat 3s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* steam rising from empty plate */
+.cart-empty__plate {
+  stroke-dasharray: 315;
+  stroke-dashoffset: 315;
+  animation: plateDraw 1.2s ease-out 0.3s forwards;
+}
+
+@keyframes plateDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cart-empty__steam {
+  opacity: 0;
+  animation: steamRise 2.5s ease-in-out infinite;
+}
+
+.cart-empty__steam--1 {
+  animation-delay: 0s;
+}
+
+.cart-empty__steam--2 {
+  animation-delay: 0.8s;
+}
+
+.cart-empty__steam--3 {
+  animation-delay: 1.6s;
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}

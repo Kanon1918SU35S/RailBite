@@ -1,0 +1,41 @@
+/* RAILBITE BD - CSS VARIABLES */
+/* Design Tokens & Theme Configuration */
+
+:root {
+  /* Colors */
+  --primary-orange: #e87e1e;
+  --orange-hover: #d47d19;
+  --orange-dark: #E67A2E;
+  --dark-bg: #030409;
+  --dark-card: #0a0f14;
+  --dark-lighter: #242424;
+  --dark-input: #0D0D0D;
+  --border-orange: #FF8C42;
+  --border-dark: #2A2A2A;
+
+  /* Text */
+  --text-white: #FFFFFF;
+  --text-gray: #d9d9d9;
+  --text-light-gray: #888888;
+
+  /* Status */
+  --success: #4CAF50;
+  --danger: #d4183d;
+  --warning: #FFC107;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 35px rgba(0, 0, 0, 0.7);
+  --shadow-orange: 0 4px 20px rgba(232, 126, 30, 0.3);
+
+  /* 3D Depth Shadows */
+  --shadow-3d-sm: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-3d-md: 0 10px 25px rgba(0, 0, 0, 0.3), 0 5px 10px rgba(0, 0, 0, 0.2);
+  --shadow-3d-lg: 0 20px 50px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+  --shadow-3d-orange: 0 15px 35px rgba(232, 126, 30, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  /* 3D Transitions */
+  --transition-3d: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}

@@ -1,0 +1,56 @@
+/* RAILBITE BD - HERO & LANDING */
+/* Hero Section, Badges, Titles */
+
+.hero-landing {
+  padding: 100px 0;
+  background: radial-gradient(circle at top right, rgba(255, 140, 66, 0.1) 0%, transparent 50%);
+  text-align: center;
+}
+
+.hero-badge {
+  background: rgba(255, 140, 66, 0.2);
+  color: var(--primary-orange);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  display: inline-block;
+  margin-bottom: 2rem;
+  border: 1px solid var(--primary-orange);
+  animation: float 3s ease-in-out infinite;
+}
+
+.hero-main-title {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #e87e1e 0%, #ff9d42 50%, #e87e1e 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.hero-description {
+  font-size: 1.15rem;
+  color: var(--text-gray);
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.8;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.hero-food-image {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}

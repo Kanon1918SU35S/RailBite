@@ -1,0 +1,296 @@
+/* RAILBITE BD - MENU PAGES */
+/* Menu Grids, Food Cards, Menu Items, Category Cards */
+
+.menu-page {
+  padding: 80px 0;
+  min-height: 70vh;
+}
+
+.menu-header {
+  margin-bottom: 3rem;
+}
+
+.menu-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.ordering-from {
+  color: var(--text-gray);
+}
+
+.ordering-from span {
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.menu-item-card {
+  background: var(--dark-card);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border-dark);
+  transition: all 0.3s;
+}
+
+.menu-item-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary-orange);
+  box-shadow: var(--shadow-orange);
+}
+
+.menu-item-image {
+  height: 200px;
+  background: var(--dark-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  overflow: hidden;
+}
+
+.menu-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-item-content {
+  padding: 1.5rem;
+}
+
+.menu-item-title {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.menu-item-description {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.menu-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-item-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+}
+
+.menu-item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Menu Grid with Orange Borders */
+.menu-grid-bordered {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+}
+
+.menu-card-bordered {
+  background: linear-gradient(135deg, rgba(10, 15, 20, 0.95) 0%, rgba(20, 25, 30, 0.95) 100%);
+  border: 2px solid var(--border-orange);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.menu-card-bordered::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.menu-card-bordered:hover::before {
+  opacity: 0.2;
+}
+
+.menu-card-bordered:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(232, 126, 30, 0.4);
+  background: rgba(15, 20, 25, 0.9);
+}
+
+.menu-card-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 15px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.menu-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.menu-card-bordered:hover .menu-card-image img {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.menu-card-info {
+  flex: 1;
+}
+
+.menu-card-info h3 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.menu-card-info .price {
+  font-size: 1.5rem;
+  color: var(--primary-orange);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Food Grid */
+.food-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.food-card {
+  background: var(--dark-card);
+  padding: 1.5rem;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid var(--border-dark);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  animation: fadeIn 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.food-card:hover {
+  transform: translateY(-15px);
+  border-color: var(--primary-orange);
+  box-shadow: 0 20px 40px rgba(232, 126, 30, 0.4);
+}
+
+.food-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  margin-bottom: 1.5rem;
+}
+
+.food-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.food-card:hover .food-image::after {
+  opacity: 1;
+}
+
+.food-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.food-card:hover .food-image img {
+  transform: scale(1.15) rotate(2deg);
+}
+
+.food-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+  margin-bottom: 1rem;
+}
+
+/* Staggered animation for food cards */
+.food-card:nth-child(1) { animation-delay: 0.1s; }
+.food-card:nth-child(2) { animation-delay: 0.2s; }
+.food-card:nth-child(3) { animation-delay: 0.3s; }
+.food-card:nth-child(4) { animation-delay: 0.4s; }
+.food-card:nth-child(5) { animation-delay: 0.5s; }
+.food-card:nth-child(6) { animation-delay: 0.6s; }
+.food-card:nth-child(7) { animation-delay: 0.7s; }
+.food-card:nth-child(8) { animation-delay: 0.8s; }
+
+/* Category Cards */
+.category-card {
+  position: relative;
+  height: 250px;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 20px;
+  transition: all 0.4s ease;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(232, 126, 30, 0.3));
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1;
+}
+
+.category-card:hover::before {
+  opacity: 1;
+}
+
+.category-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(232, 126, 30, 0.5);
+}
+
+/* Glass Morphism Effect */
+.feature-card {
+  backdrop-filter: blur(10px);
+  background: rgba(10, 15, 20, 0.8);
+  border: 1px solid rgba(255, 140, 66, 0.1);
+}

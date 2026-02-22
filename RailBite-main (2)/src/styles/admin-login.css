@@ -1,0 +1,187 @@
+/* ========================================
+   ADMIN LOGIN - RAILBITE BD
+   Same family as auth.css (dark + orange)
+======================================== */
+
+.admin-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  background: var(--dark-bg);
+}
+
+.admin-auth-container {
+  background: var(--dark-card);
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 450px;
+  width: 100%;
+  border: 1px solid var(--border-dark);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Header */
+
+.admin-auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-auth-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.admin-login-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.admin-auth-logo h1 {
+  color: var(--primary-orange);
+  font-size: 1.9rem;
+  margin-top: 0.2rem;
+}
+
+.admin-auth-subtitle {
+  color: var(--text-gray);
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.admin-auth-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-orange);
+  background: rgba(232, 126, 30, 0.1);
+  color: var(--primary-orange);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* Form */
+
+.admin-auth-form .form-group {
+  margin-bottom: 1.3rem;
+}
+
+.admin-auth-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-gray);
+}
+
+.admin-auth-form input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-dark);
+  background: var(--dark-bg);
+  color: var(--text-white);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-auth-form input::placeholder {
+  color: var(--text-gray);
+}
+
+.admin-auth-form input:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 1px rgba(232, 126, 30, 0.35);
+  background: #111;
+}
+
+/* Error box */
+
+.admin-login-error {
+  margin-bottom: 1rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(220, 53, 69, 0.12);
+  border: 1px solid rgba(220, 53, 69, 0.6);
+  color: #ffb3b8;
+  font-size: 0.88rem;
+}
+
+/* Demo credentials */
+
+.admin-demo-credentials {
+  margin-top: 1.3rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(232, 126, 30, 0.08);
+  border: 1px dashed var(--border-orange);
+  color: var(--text-gray);
+  font-size: 0.85rem;
+}
+
+.admin-demo-credentials p:first-child {
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: var(--primary-orange);
+}
+
+/* Footer */
+
+.admin-auth-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.3rem;
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  gap: 0.6rem;
+}
+
+.admin-auth-footer span {
+  opacity: 0.9;
+}
+
+.admin-auth-footer a {
+  color: var(--primary-orange);
+  font-size: 0.9rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.admin-auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Button uses global .btn, .btn-primary, .btn-block */
+.admin-auth-form .btn.btn-primary.btn-block {
+  margin-top: 0.2rem;
+}
+
+/* Responsive */
+
+@media (max-width: 576px) {
+  .admin-auth-container {
+    padding: 2.2rem 1.7rem;
+    border-radius: 18px;
+  }
+
+  .admin-auth-logo h1 {
+    font-size: 1.7rem;
+  }
+
+  .admin-auth-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .admin-auth-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,202 @@
+/* ============================================
+   RAILBITE BD - ORDER SUCCESS PAGE
+   Celebration confetti + animated checkmark
+   ============================================ */
+
+.os-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark-bg);
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+/* confetti canvas */
+.os-confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* card */
+.os-card {
+    position: relative;
+    z-index: 1;
+    background: var(--dark-card);
+    border: 1px solid var(--border-dark);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.os-card--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* animated SVG checkmark */
+.os-check {
+    margin: 0 auto 1.5rem;
+    width: 90px;
+    height: 90px;
+}
+
+.os-check__svg {
+    width: 100%;
+    height: 100%;
+}
+
+.os-check__circle {
+    fill: none;
+    stroke: #4ade80;
+    stroke-width: 3;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    animation: osCircleDraw 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes osCircleDraw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.os-check__tick {
+    fill: none;
+    stroke: #4ade80;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: osTickDraw 0.5s ease-out 1s forwards;
+}
+
+@keyframes osTickDraw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* typography */
+.os-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+}
+
+.os-subtitle {
+    color: var(--text-gray);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* info rows */
+.os-info {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.os-info__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.os-info__label {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.os-info__value {
+    color: var(--text-white);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.os-info__value--highlight {
+    color: var(--primary-orange);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* action buttons */
+.os-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.os-btn {
+    flex: 1;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.os-btn:hover {
+    transform: translateY(-2px);
+}
+
+.os-btn--primary {
+    background: var(--primary-orange);
+    color: #fff;
+}
+
+.os-btn--primary:hover {
+    box-shadow: 0 6px 24px rgba(232, 126, 30, 0.35);
+}
+
+.os-btn--ghost {
+    background: transparent;
+    border: 1px solid var(--border-dark);
+    color: var(--text-gray);
+}
+
+.os-btn--ghost:hover {
+    border-color: var(--primary-orange);
+    color: var(--primary-orange);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 520px) {
+    .os-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .os-title {
+        font-size: 1.5rem;
+    }
+
+    .os-check {
+        width: 70px;
+        height: 70px;
+    }
+
+    .os-actions {
+        flex-direction: column;
+    }
+}

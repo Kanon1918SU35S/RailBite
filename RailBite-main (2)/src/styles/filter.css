@@ -1,0 +1,535 @@
+/* =====================================================
+   ADVANCED FILTER STYLING
+   ===================================================== */
+
+.filter-section {
+  background: var(--dark-card);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-dark);
+  margin-bottom: 2rem;
+}
+
+.filter-section h3 {
+  color: var(--text-white);
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--primary-orange);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.filter-section h3::before {
+  content: '⚙️';
+  font-size: 1.5rem;
+}
+
+/* =====================================================
+   CHECKBOX FILTERS
+   ===================================================== */
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.filter-option:last-child {
+  border-bottom: none;
+}
+
+.filter-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-right: 1rem;
+  cursor: pointer;
+  accent-color: var(--primary-orange);
+  transition: transform 0.2s ease;
+}
+
+.filter-checkbox:hover {
+  transform: scale(1.1);
+}
+
+.filter-checkbox:checked {
+  accent-color: var(--primary-orange);
+}
+
+.filter-option label {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  flex: 1;
+}
+
+.filter-option input[type="checkbox"]:checked + label {
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.filter-option label:hover {
+  color: var(--text-white);
+}
+
+/* =====================================================
+   PRICE RANGE FILTER
+   ===================================================== */
+
+.price-filter-wrapper {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.price-filter-wrapper h4 {
+  color: var(--text-white);
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+}
+
+.price-range-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.price-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.price-input-label {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.price-input {
+  padding: 0.8rem 1rem;
+  background: var(--dark-input);
+  border: 2px solid var(--border-dark);
+  border-radius: 10px;
+  color: var(--text-white);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.price-input::placeholder {
+  color: var(--text-light-gray);
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 3px rgba(232, 126, 30, 0.2);
+  background: rgba(232, 126, 30, 0.05);
+}
+
+.price-input:hover {
+  border-color: rgba(232, 126, 30, 0.5);
+}
+
+/* =====================================================
+   SORT OPTIONS
+   ===================================================== */
+
+.sort-section {
+  background: var(--dark-card);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-dark);
+  margin-bottom: 2rem;
+}
+
+.sort-section h3 {
+  color: var(--text-white);
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--primary-orange);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.sort-section h3::before {
+  content: '📊';
+  font-size: 1.5rem;
+}
+
+.sort-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem;
+  background: var(--dark-input);
+  border: 2px solid var(--border-dark);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sort-option:hover {
+  border-color: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.08);
+}
+
+.sort-option input[type="radio"] {
+  margin-right: 0.8rem;
+  cursor: pointer;
+  accent-color: var(--primary-orange);
+}
+
+.sort-option label {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.sort-option input[type="radio"]:checked + label {
+  color: var(--primary-orange);
+  font-weight: 700;
+}
+
+/* =====================================================
+   FILTER ACTIONS
+   ===================================================== */
+
+.filter-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.btn-apply-filter {
+  flex: 1;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  color: var(--text-white);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(232, 126, 30, 0.3);
+}
+
+.btn-apply-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(232, 126, 30, 0.4);
+}
+
+.btn-apply-filter:active {
+  transform: translateY(0);
+}
+
+.btn-reset-filter {
+  flex: 1;
+  padding: 1rem;
+  background: transparent;
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-reset-filter:hover {
+  background: rgba(232, 126, 30, 0.1);
+  border-color: var(--primary-orange);
+  color: var(--text-white);
+}
+
+.btn-reset-filter:active {
+  transform: scale(0.98);
+}
+
+/* =====================================================
+   FILTER RESULTS COUNT
+   ===================================================== */
+
+.filter-results-info {
+  background: rgba(232, 126, 30, 0.08);
+  border: 1px solid var(--border-orange);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-results-count {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+}
+
+.filter-results-count strong {
+  color: var(--primary-orange);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.filter-clear-btn {
+  background: transparent;
+  color: var(--text-gray);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.filter-clear-btn:hover {
+  color: var(--primary-orange);
+  text-decoration: underline;
+}
+
+/* =====================================================
+   NO RESULTS STATE
+   ===================================================== */
+
+.filter-no-results {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--dark-card);
+  border-radius: 20px;
+  border: 2px dashed var(--border-dark);
+}
+
+.filter-no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.filter-no-results h3 {
+  color: var(--text-white);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.filter-no-results p {
+  color: var(--text-gray);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+
+@media (max-width: 968px) {
+  .filter-section,
+  .sort-section {
+    padding: 1.5rem;
+  }
+
+  .sort-options {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .filter-actions {
+    flex-direction: column;
+  }
+
+  .btn-apply-filter,
+  .btn-reset-filter {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-section,
+  .sort-section {
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 15px;
+  }
+
+  .filter-section h3,
+  .sort-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+  }
+
+  .sort-options {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .price-range-container {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .price-input {
+    width: 100%;
+  }
+
+  .filter-results-info {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 576px) {
+  .filter-section,
+  .sort-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+  }
+
+  .filter-section h3,
+  .sort-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .filter-option {
+    padding: 0.6rem 0;
+  }
+
+  .filter-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.8rem;
+  }
+
+  .filter-option label {
+    font-size: 0.9rem;
+  }
+
+  .sort-options {
+    grid-template-columns: 1fr;
+  }
+
+  .sort-option {
+    padding: 0.7rem;
+  }
+
+  .price-input-label {
+    font-size: 0.8rem;
+  }
+
+  .price-input {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-apply-filter,
+  .btn-reset-filter {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .filter-no-results {
+    padding: 2rem 1rem;
+  }
+
+  .filter-no-results-icon {
+    font-size: 3rem;
+  }
+
+  .filter-no-results h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* =====================================================
+   ANIMATION & EFFECTS
+   ===================================================== */
+
+@keyframes slideInFilter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-section,
+.sort-section {
+  animation: slideInFilter 0.4s ease-out;
+}
+
+/* Smooth transitions for all filter elements */
+.filter-option,
+.sort-option,
+.price-input,
+.btn-apply-filter,
+.btn-reset-filter {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus visible for accessibility */
+.filter-checkbox:focus-visible,
+.price-input:focus-visible,
+.sort-option input:focus-visible {
+  outline: 2px solid var(--primary-orange);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.filter-checkbox:disabled,
+.price-input:disabled,
+.sort-option input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-apply-filter:disabled,
+.btn-reset-filter:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* =====================================================
+   LOADING STATE
+   ===================================================== */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.filter-loading {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    var(--dark-input) 0%,
+    var(--dark-lighter) 50%,
+    var(--dark-input) 100%
+  );
+  background-size: 1000px 100%;
+}

@@ -1,0 +1,304 @@
+/* ========================================
+   RAILBITE BD - USER SIDEBAR
+   Responsive slide-in sidebar for customers
+======================================== */
+
+/* =========================
+   OVERLAY
+========================= */
+
+.user-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.user-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =========================
+   SIDEBAR PANEL
+========================= */
+
+.user-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    max-width: 85vw;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--dark-card);
+    border-left: 1px solid var(--border-dark);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.user-sidebar.active {
+    right: 0;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.user-sidebar-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-gray);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    z-index: 2;
+}
+
+.user-sidebar-close:hover {
+    background: rgba(232, 126, 30, 0.15);
+    color: var(--primary-orange);
+    transform: scale(1.08);
+}
+
+/* =========================
+   HEADER / USER INFO
+========================= */
+
+.user-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.8rem 1.4rem 1.2rem;
+}
+
+.user-sidebar-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+    color: var(--text-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.user-sidebar-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    overflow: hidden;
+}
+
+.user-sidebar-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-sidebar-email {
+    font-size: 0.82rem;
+    color: var(--text-light-gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-sidebar-guest {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+/* =========================
+   DIVIDER
+========================= */
+
+.user-sidebar-divider {
+    height: 1px;
+    background: var(--border-dark);
+    margin: 0.5rem 1.4rem;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+
+.user-sidebar-section-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-light-gray);
+    padding: 0.3rem 1.4rem 0.1rem;
+    margin: 0;
+}
+
+/* =========================
+   NAV LINKS
+========================= */
+
+.user-sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0.4rem 0;
+}
+
+.user-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem 1.4rem;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    border-left: 3px solid transparent;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.user-sidebar-link:hover {
+    background: rgba(232, 126, 30, 0.07);
+    color: var(--text-white);
+    border-left-color: rgba(232, 126, 30, 0.4);
+}
+
+.user-sidebar-link.active {
+    background: rgba(232, 126, 30, 0.12);
+    color: var(--primary-orange);
+    border-left-color: var(--primary-orange);
+}
+
+.user-sidebar-icon {
+    font-size: 1.1rem;
+    width: 1.4rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Cart badge */
+
+.user-sidebar-badge {
+    margin-left: auto;
+    background: var(--primary-orange);
+    color: var(--text-white);
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+}
+
+/* =========================
+   FOOTER (logout / login)
+========================= */
+
+.user-sidebar-footer {
+    padding: 1rem 1.4rem 1.4rem;
+    margin-top: auto;
+}
+
+.user-sidebar-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    border-radius: 10px;
+    border: 1px solid rgba(244, 67, 54, 0.5);
+    background: rgba(244, 67, 54, 0.1);
+    color: #ffb3b3;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.12s;
+}
+
+.user-sidebar-logout:hover {
+    background: rgba(244, 67, 54, 0.22);
+    box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.4);
+    transform: translateY(-1px);
+}
+
+.user-sidebar-login-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 25px;
+    border: none;
+    background: var(--primary-orange);
+    color: var(--text-white);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: var(--shadow-orange);
+    transition: background 0.2s, transform 0.15s;
+}
+
+.user-sidebar-login-btn:hover {
+    background: var(--orange-hover);
+    transform: translateY(-2px);
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.user-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.user-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.user-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+    border-radius: 999px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+/* On very small screens, take more width */
+@media (max-width: 360px) {
+    .user-sidebar {
+        width: 280px;
+    }
+}

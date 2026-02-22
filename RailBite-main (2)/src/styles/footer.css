@@ -1,0 +1,208 @@
+/* ============================================
+   RAILBITE BD - FOOTER (Modern)
+   Wave divider, social icons, newsletter
+   ============================================ */
+
+.footer {
+  background: var(--dark-bg);
+  padding: 60px 0 20px;
+  border-top: 1px solid var(--border-dark);
+}
+
+/* --- wave divider --- */
+.footer--modern {
+  position: relative;
+  padding-top: 80px;
+  margin-top: 0;
+  border-top: none;
+}
+
+.footer__wave {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.footer__wave svg {
+  width: 100%;
+  height: 60px;
+  display: block;
+}
+
+/* --- grid --- */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+/* --- logo --- */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.footer-logo h3 {
+  color: var(--primary-orange);
+  font-size: 1.4rem;
+}
+
+.footer-logo__bd {
+  font-weight: 400;
+  opacity: 0.6;
+  margin-left: 2px;
+  font-size: 0.85em;
+}
+
+.footer-logo__icon {
+  font-size: 1.6rem;
+}
+
+.footer-col--brand .footer-col__desc {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+
+/* --- columns --- */
+.footer-col h4 {
+  color: var(--primary-orange);
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.footer-col p,
+.footer-col li {
+  color: var(--text-gray);
+  margin-bottom: 0.65rem;
+  font-size: 0.9rem;
+}
+
+.footer-col a {
+  color: var(--text-gray);
+  text-decoration: none;
+  transition: color 0.25s, padding-left 0.25s;
+}
+
+.footer-col a:hover {
+  color: var(--primary-orange);
+  padding-left: 4px;
+}
+
+/* --- social icons --- */
+.footer-socials {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.footer-social {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: all 0.3s;
+}
+
+.footer-social:hover {
+  background: var(--primary-orange);
+  border-color: var(--primary-orange);
+  color: #fff;
+  transform: translateY(-3px);
+}
+
+/* --- newsletter --- */
+.footer-newsletter {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-dark);
+  transition: border-color 0.3s;
+}
+
+.footer-newsletter:focus-within {
+  border-color: var(--primary-orange);
+}
+
+.footer-newsletter__input {
+  flex: 1;
+  padding: 0.65rem 0.85rem;
+  background: var(--dark-card);
+  border: none;
+  color: var(--text-white);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.footer-newsletter__input::placeholder {
+  color: #555;
+}
+
+.footer-newsletter__btn {
+  padding: 0.65rem 1rem;
+  background: var(--primary-orange);
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.footer-newsletter__btn:hover {
+  background: #d06a10;
+}
+
+.footer-newsletter__thanks {
+  color: #4ade80;
+  font-size: 0.82rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* --- contact rows --- */
+.footer-contact-row {
+  color: var(--text-gray);
+  font-size: 0.88rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- bottom bar --- */
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-dark);
+  color: var(--text-light-gray);
+  font-size: 0.85rem;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 968px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer--modern {
+    padding-top: 60px;
+  }
+}
