@@ -30,8 +30,8 @@ const OrderTrain = () => {
     e.preventDefault();
 
     if (
-      !formData.passengerName ||
-      !formData.phone ||
+      //!formData.passengerName ||
+      //!formData.phone ||
       !formData.trainNumber ||
       !formData.coachNumber ||
       !formData.seatNumber
@@ -68,24 +68,10 @@ const OrderTrain = () => {
 
           <form className="booking-form" onSubmit={handleSubmit}>
             <div className="form-row">
-              <div className="form-group">
-                <label>Passenger Name</label>
-                <input
-                  type="text"
-                  value={formData.passengerName}
-                  readOnly
-                  style={{ opacity: 0.7, cursor: 'default' }}
-                />
-              </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  readOnly
-                  style={{ opacity: 0.7, cursor: 'default' }}
-                />
-              </div>
+              {/* Hidden - auto-filled from user profile, stored in DB */}
+<input type="hidden" name="passengerName" value={formData.passengerName} />
+<input type="hidden" name="phone" value={formData.phone} />
+
             </div>
 
             <div className="form-group">
