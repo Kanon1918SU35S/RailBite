@@ -67,6 +67,11 @@ export const orderAPI = {
   getAssignmentStats: (token) =>
     axios.get(`${API_BASE_URL}/orders/assignment-stats`, {
       headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  reorder: (id, token) =>
+    axios.post(`${API_BASE_URL}/orders/${id}/reorder`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
     })
 };
 
@@ -404,6 +409,99 @@ export const paymentAPI = {
   // Admin
   getAll: (token) =>
     axios.get(`${API_BASE_URL}/payments`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
+
+// ── Train Info API ──
+export const trainAPI = {
+  search: (query, token) =>
+    axios.get(`${API_BASE_URL}/trains/search?q=${encodeURIComponent(query)}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  getByNumber: (trainNumber, token) =>
+    axios.get(`${API_BASE_URL}/trains/${trainNumber}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  getStations: (trainNumber, token) =>
+    axios.get(`${API_BASE_URL}/trains/${trainNumber}/stations`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // Admin
+  getAll: (token) =>
+    axios.get(`${API_BASE_URL}/trains`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  create: (data, token) =>
+    axios.post(`${API_BASE_URL}/trains`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  update: (id, data, token) =>
+    axios.put(`${API_BASE_URL}/trains/${id}`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  delete: (id, token) =>
+    axios.delete(`${API_BASE_URL}/trains/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
+
+// ── Loyalty Points API ──
+export const loyaltyAPI = {
+  getMyPoints: (token) =>
+    axios.get(`${API_BASE_URL}/loyalty/my-points`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  getHistory: (token) =>
+    axios.get(`${API_BASE_URL}/loyalty/history`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  redeem: (data, token) =>
+    axios.post(`${API_BASE_URL}/loyalty/redeem`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // Admin
+  getAll: (token) =>
+    axios.get(`${API_BASE_URL}/loyalty/admin/all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  awardBonus: (data, token) =>
+    axios.post(`${API_BASE_URL}/loyalty/admin/bonus`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
+
+// ── Dashboard Analytics API (enhanced) ──
+export const analyticsAPI = {
+  getAnalytics: (range, token) =>
+    axios.get(`${API_BASE_URL}/dashboard/analytics?range=${range}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
+
+// ── Push Notifications API ──
+export const pushAPI = {
+  getVapidKey: () => axios.get(`${API_BASE_URL}/push/vapid-key`),
+  subscribe: (subscription, token) =>
+    axios.post(`${API_BASE_URL}/push/subscribe`, { subscription }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+  unsubscribe: (token) =>
+    axios.post(`${API_BASE_URL}/push/unsubscribe`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+  broadcast: (data, token) =>
+    axios.post(`${API_BASE_URL}/push/broadcast`, data, {
       headers: { Authorization: `Bearer ${token}` }
     })
 };

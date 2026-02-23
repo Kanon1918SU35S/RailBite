@@ -4,12 +4,24 @@ const Menu = require('../models/Menu');
 // Supports query params: ?section=breakfast&category=burger&available=true
 exports.getAllMenu = async (req, res) => {
   try {
-    const { section, category, available } = req.query;
+    const { section, category, available, dietaryType, allergenFree, isSpicy, isPopular } = req.query;
     const filter = {};
     if (section) filter.section = section;
     if (category) filter.category = category;
     // Public callers pass available=true; admin calls without it get all items
     if (available !== undefined) filter.available = available === 'true';
+    // Dietary type filter: veg, non-veg, vegan, egg
+    if (dietaryType) filter.dietaryType = dietaryType;
+    // Allergen-free filter: exclude items with specific allergens
+    if (allergenFree) {
+      const allergensToExclude = allergenFree.split(',').map(a => a.trim());
+      filter.allergens = { $nin: allergensToExclude };
+    }
+    // Spicy filter
+    if (isSpicy !== undefined) filter.isSpicy = isSpicy === 'true';
+    // Popular items filter
+    if (isPopular !== undefined) filter.isPopular = isPopular === 'true';
+
     const items = await Menu.find(filter).sort({ createdAt: -1 });
     res.json({ success: true, data: items });
   } catch (error) {

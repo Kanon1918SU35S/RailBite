@@ -151,6 +151,15 @@ const UserSidebar = ({ isOpen, onClose }) => {
                                 <span>Notifications</span>
                             </NavLink>
 
+                            <NavLink
+                                to="/loyalty"
+                                className={({ isActive }) => `user-sidebar-link ${isActive ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <span className="user-sidebar-icon">🎖️</span>
+                                <span>Loyalty Points</span>
+                            </NavLink>
+
                             <div className="user-sidebar-divider" />
                             <p className="user-sidebar-section-title">Account</p>
 

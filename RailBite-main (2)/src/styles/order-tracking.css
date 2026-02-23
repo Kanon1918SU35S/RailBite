@@ -73,11 +73,9 @@
 
 .tracking-progress-bar-fill {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--primary-orange) 0%,
-    var(--orange-hover) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--primary-orange) 0%,
+      var(--orange-hover) 100%);
   border-radius: 10px;
   transition: width 0.4s ease;
 }
@@ -121,7 +119,7 @@
   position: relative;
 }
 
-.timeline-step + .timeline-step {
+.timeline-step+.timeline-step {
   margin-top: 1.4rem;
 }
 
@@ -317,8 +315,10 @@
 }
 
 .tracking-cancel-btn {
-  background: var(--danger);
-  border-color: var(--danger);
+  background: rgba(231, 76, 60, 0.85);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Empty state reused from order history */
@@ -369,7 +369,15 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

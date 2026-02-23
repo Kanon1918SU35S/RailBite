@@ -5,12 +5,14 @@
 
 .notification-btn {
   position: relative;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--text-gray);
   font-size: 1.6rem;
   cursor: pointer;
   padding: 0.6rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -23,6 +25,7 @@
   color: var(--primary-orange);
   transform: scale(1.15) rotate(-10deg);
   background: rgba(255, 140, 66, 0.1);
+  border-color: rgba(255, 140, 66, 0.2);
 }
 
 .notification-badge {
@@ -47,10 +50,13 @@
 }
 
 @keyframes badge-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(255, 71, 87, 0.5);
   }
+
   50% {
     transform: scale(1.2);
     box-shadow: 0 6px 16px rgba(255, 71, 87, 0.7);
@@ -134,34 +140,36 @@
 
 .notification-action-btn {
   padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(255, 140, 66, 0.08));
-  border: 2px solid rgba(255, 140, 66, 0.4);
+  background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(255, 140, 66, 0.06));
+  border: 2px solid rgba(255, 140, 66, 0.3);
   border-radius: 10px;
   color: var(--primary-orange);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .notification-action-btn:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .notification-action-btn.danger {
-  background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.08));
-  border-color: rgba(231, 76, 60, 0.4);
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.05));
+  border-color: rgba(231, 76, 60, 0.3);
   color: var(--danger);
 }
 
 .notification-action-btn.danger:hover {
-  background: var(--danger);
+  background: rgba(231, 76, 60, 0.85);
   color: var(--text-white);
-  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .notification-list {

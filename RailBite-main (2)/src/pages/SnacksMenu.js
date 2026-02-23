@@ -29,6 +29,8 @@ const SnacksMenu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('default');
   const [priceRange, setPriceRange] = useState('all');
+  const [dietaryType, setDietaryType] = useState('');
+  const [allergenFree, setAllergenFree] = useState('');
 
   const [snackItems, setSnackItems] = useState([]);
   const [submenuCards, setSubmenuCards] = useState([]);
@@ -220,6 +222,11 @@ const SnacksMenu = () => {
           onSortChange={setSortBy}
           priceRange={priceRange}
           onPriceRangeChange={setPriceRange}
+          showDietaryFilters={true}
+          dietaryType={dietaryType}
+          onDietaryTypeChange={setDietaryType}
+          allergenFree={allergenFree}
+          onAllergenFreeChange={setAllergenFree}
         />
 
         {loading && <p>Loading snacks...</p>}

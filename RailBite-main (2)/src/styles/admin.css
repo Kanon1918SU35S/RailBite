@@ -171,8 +171,8 @@
   width: 100%;
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid rgba(244, 67, 54, 0.7);
-  background: rgba(244, 67, 54, 0.16);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  background: rgba(244, 67, 54, 0.12);
   color: #ffb3b3;
   font-size: 0.9rem;
   font-weight: 500;
@@ -181,13 +181,15 @@
   justify-content: center;
   align-items: center;
   gap: 0.4rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: background 0.2s ease, color 0.2s ease, transform 0.12s ease,
     box-shadow 0.2s ease;
 }
 
 .admin-logout-btn:hover {
-  background: rgba(244, 67, 54, 0.28);
-  box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.5);
+  background: rgba(244, 67, 54, 0.25);
+  box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
 }
 
@@ -198,7 +200,8 @@
 .admin-content {
   flex: 1;
   padding: 2rem 2.5rem;
-  margin-left: 260px; /* must match .admin-sidebar width */
+  margin-left: 260px;
+  /* must match .admin-sidebar width */
 }
 
 /* Header */
@@ -400,18 +403,20 @@
 /* Button link */
 
 .admin-btn-link {
-  background: transparent;
-  border: none;
+  background: rgba(232, 126, 30, 0.06);
+  border: 1px solid rgba(232, 126, 30, 0.15);
   color: var(--primary-orange);
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.25rem 0.4rem;
   border-radius: 6px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .admin-btn-link:hover {
-  background: rgba(232, 126, 30, 0.12);
+  background: rgba(232, 126, 30, 0.18);
 }
 
 /* =========================
@@ -601,6 +606,7 @@
 }
 
 @media (max-width: 576px) {
+
   .admin-stats-grid,
   .admin-stats-grid-small {
     grid-template-columns: 1fr;

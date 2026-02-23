@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import { orderAPI, reviewAPI } from '../services/api';
+import { useCart } from '../context/CartContext';
 
 /* ---------- tiny helpers ---------- */
 const AnimNum = ({ value, prefix = '' }) => {
@@ -53,12 +54,14 @@ const FILTERS = [
 /* ================================================ */
 function OrderHistory() {
   const navigate = useNavigate();
+  const { addToCart, clearCart } = useCart();
   const [orders, setOrders] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviewedOrders, setReviewedOrders] = useState({});
   const [mounted, setMounted] = useState(false);
+  const [reordering, setReordering] = useState(null);
 
   useEffect(() => { fetchMyOrders(); setTimeout(() => setMounted(true), 50); }, []);
 
@@ -85,6 +88,33 @@ function OrderHistory() {
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Error loading orders');
     } finally { setLoading(false); }
+  };
+
+  const handleReorder = async (orderId) => {
+    try {
+      setReordering(orderId);
+      const token = localStorage.getItem('railbiteToken');
+      const res = await orderAPI.reorder(orderId, token);
+      if (res.data.success) {
+        clearCart();
+        const items = res.data.data.items || [];
+        items.forEach(item => {
+          for (let i = 0; i < item.quantity; i++) {
+            addToCart({
+              _id: item.name, // use name as key since original item ID might not be available
+              name: item.name,
+              price: item.price,
+              image: item.image || ''
+            });
+          }
+        });
+        navigate('/cart');
+      }
+    } catch (err) {
+      console.error('Reorder error:', err);
+    } finally {
+      setReordering(null);
+    }
   };
 
   /* derived data */
@@ -239,6 +269,15 @@ function OrderHistory() {
                       <button className="oh-btn oh-btn--primary oh-btn--sm" onClick={() => navigate(`/order-tracking/${order.orderNumber}`)}>
                         View Details
                       </button>
+                      {order.status === 'delivered' && (
+                        <button
+                          className="oh-btn oh-btn--ghost oh-btn--sm"
+                          onClick={() => handleReorder(order._id)}
+                          disabled={reordering === order._id}
+                        >
+                          {reordering === order._id ? '...' : '🔄 Reorder'}
+                        </button>
+                      )}
                       {order.status === 'delivered' && (
                         reviewedOrders[order._id] ? (
                           <button className="oh-btn oh-btn--ghost oh-btn--sm oh-btn--rated" onClick={() => navigate(`/review/${order._id}`)}>

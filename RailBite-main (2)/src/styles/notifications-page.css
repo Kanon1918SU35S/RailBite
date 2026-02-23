@@ -39,13 +39,15 @@
 /* Beautiful Buttons - Main Page */
 .btn-secondary {
   padding: 0.9rem 1.8rem;
-  background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(255, 140, 66, 0.05));
-  border: 2px solid var(--primary-orange);
+  background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(255, 140, 66, 0.04));
+  border: 2px solid rgba(232, 126, 30, 0.4);
   border-radius: 12px;
   color: var(--primary-orange);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -67,10 +69,10 @@
 }
 
 .btn-secondary:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 140, 66, 0.4);
+  box-shadow: 0 8px 24px rgba(255, 140, 66, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-secondary:active {
@@ -79,13 +81,15 @@
 
 .btn-danger-outline {
   padding: 0.9rem 1.8rem;
-  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.05));
-  border: 2px solid var(--danger);
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.08), rgba(231, 76, 60, 0.03));
+  border: 2px solid rgba(231, 76, 60, 0.4);
   border-radius: 12px;
   color: var(--danger);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -266,10 +270,13 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.7;
     transform: scale(1.3);
@@ -313,11 +320,13 @@
 }
 
 .btn-link-small {
-  background: none;
-  border: 2px solid transparent;
+  background: rgba(255, 140, 66, 0.05);
+  border: 2px solid rgba(255, 140, 66, 0.1);
   color: var(--primary-orange);
   font-size: 0.95rem;
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   font-weight: 600;
   padding: 0.6rem 1.2rem;
@@ -325,8 +334,8 @@
 }
 
 .btn-link-small:hover {
-  background: rgba(255, 140, 66, 0.1);
-  border-color: var(--primary-orange);
+  background: rgba(255, 140, 66, 0.12);
+  border-color: rgba(232, 126, 30, 0.4);
   transform: translateY(-2px);
 }
 
@@ -356,8 +365,15 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .no-notifications-page h2 {
@@ -375,20 +391,22 @@
 
 .btn-primary {
   padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, var(--primary-orange), #ff9d4d);
-  border: none;
+  background: linear-gradient(135deg, rgba(232, 126, 30, 0.9), rgba(255, 157, 77, 0.85));
+  border: 1px solid rgba(255, 180, 100, 0.25);
   border-radius: 12px;
   color: var(--text-white);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(255, 140, 66, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(255, 140, 66, 0.5);
+  box-shadow: 0 10px 35px rgba(255, 140, 66, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-primary:active {

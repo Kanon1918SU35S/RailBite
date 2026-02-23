@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const User = require('../models/User');
 const DeliveryStaff = require('../models/DeliveryStaff');
+const LoyaltyPoints = require('../models/LoyaltyPoints');
 const { createNotification } = require('./notificationController');
+const { sendPushNotification } = require('../utils/pushNotification');
 const { emitOrderUpdate, emitNewOrder, emitNotification, emitRoleNotification } = require('../sockets/orderSocket');
 
 // GET /api/orders - all orders (admin)
@@ -92,7 +94,12 @@ exports.createOrder = async (req, res) => {
       vat: vat || 0,
       deliveryFee: deliveryFee || 50,
       totalAmount: total,
-      status: 'pending'
+      status: 'pending',
+      trackingHistory: [{
+        status: 'pending',
+        message: 'Order placed successfully',
+        updatedBy: req.user._id
+      }]
     });
 
     // Auto-notify: customer gets order confirmation
@@ -149,6 +156,22 @@ exports.updateOrderStatus = async (req, res) => {
     if (status) order.status = status;
     if (deliveryStatus) order.deliveryStatus = deliveryStatus;
 
+    // Add tracking history entry
+    const trackingMessages = {
+      confirmed: 'Order has been confirmed by the restaurant',
+      preparing: 'Your food is being prepared',
+      on_the_way: 'Your order is on the way',
+      delivered: 'Order has been delivered successfully',
+      cancelled: 'Order has been cancelled'
+    };
+    if (status && trackingMessages[status]) {
+      order.trackingHistory.push({
+        status,
+        message: trackingMessages[status],
+        updatedBy: req.user._id
+      });
+    }
+
     await order.save();
 
     // If cancelled or delivered and had staff assigned, release/update them
@@ -190,6 +213,30 @@ exports.updateOrderStatus = async (req, res) => {
         targetUser: order.user,
         relatedOrder: order._id
       });
+
+      // Send browser push notification to the customer
+      try {
+        const customer = await User.findById(order.user).select('pushSubscription pushEnabled');
+        if (customer && customer.pushEnabled && customer.pushSubscription?.endpoint) {
+          await sendPushNotification(customer.pushSubscription, {
+            title: `Order ${status === 'cancelled' ? 'Cancelled' : 'Update'}`,
+            body: `Your order ${order.orderNumber} has been ${statusLabels[status]}.`,
+            url: '/order-history',
+            tag: `order-${order._id}`,
+          });
+        }
+      } catch (pushErr) {
+        console.error('[Push] Error sending push:', pushErr.message);
+      }
+    }
+
+    // Auto-award loyalty points when order is delivered
+    if (status === 'delivered') {
+      try {
+        await LoyaltyPoints.earnPoints(order.user, order._id, order.totalAmount);
+      } catch (loyaltyErr) {
+        console.error('[Loyalty] Error awarding points:', loyaltyErr.message);
+      }
     }
 
     // Re-fetch with populated fields
@@ -461,3 +508,43 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
+// POST /api/orders/:id/reorder - reorder items from a previous order
+exports.reorder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let originalOrder;
+
+    const isObjectId = mongoose.Types.ObjectId.isValid(id);
+    if (isObjectId) {
+      originalOrder = await Order.findById(id);
+    }
+    if (!originalOrder) {
+      originalOrder = await Order.findOne({ orderNumber: id });
+    }
+    if (!originalOrder) {
+      return res.status(404).json({ success: false, message: 'Original order not found' });
+    }
+
+    // Only allow reorder of own orders
+    if (originalOrder.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+
+    // Return item data for the frontend to populate cart
+    res.json({
+      success: true,
+      data: {
+        items: originalOrder.items,
+        orderType: originalOrder.orderType,
+        bookingDetails: originalOrder.bookingDetails,
+        contactInfo: originalOrder.contactInfo,
+        subtotal: originalOrder.subtotal,
+        vat: originalOrder.vat,
+        deliveryFee: originalOrder.deliveryFee,
+        totalAmount: originalOrder.totalAmount
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

@@ -532,8 +532,10 @@ const modalHeaderStyle = {
 };
 
 const modalCloseBtnStyle = {
-  background: 'none', border: 'none', color: 'var(--text-gray)',
-  fontSize: '1.8rem', cursor: 'pointer', lineHeight: 1
+  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+  borderRadius: '8px', color: 'var(--text-gray)',
+  fontSize: '1.8rem', cursor: 'pointer', lineHeight: 1,
+  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)'
 };
 
 const orderSummaryStyle = {
@@ -561,17 +563,19 @@ const staffCardStyle = {
 
 const cancelBtnStyle = {
   padding: '0.6rem 1.2rem', borderRadius: '10px',
-  border: '1px solid var(--border-dark, #2d2d44)',
-  background: 'transparent', color: 'var(--text-gray, #aaa)',
-  fontSize: '0.9rem', cursor: 'pointer'
+  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'rgba(255,255,255,0.04)', color: 'var(--text-gray, #aaa)',
+  fontSize: '0.9rem', cursor: 'pointer',
+  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)'
 };
 
 const assignBtnStyle = {
   padding: '0.6rem 1.4rem', borderRadius: '10px',
-  border: 'none',
-  background: 'var(--primary-orange, #e87e1e)',
+  border: '1px solid rgba(255,180,100,0.25)',
+  background: 'rgba(232,126,30,0.85)',
   color: '#fff', fontSize: '0.9rem', fontWeight: 600,
-  boxShadow: '0 4px 12px rgba(232,126,30,0.4)',
+  boxShadow: '0 4px 16px rgba(232,126,30,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
   transition: 'opacity 0.2s'
 };
 

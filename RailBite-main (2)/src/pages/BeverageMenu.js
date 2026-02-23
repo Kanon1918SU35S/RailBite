@@ -14,6 +14,8 @@ const BeverageMenu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('default');
   const [priceRange, setPriceRange] = useState('all');
+  const [dietaryType, setDietaryType] = useState('');
+  const [allergenFree, setAllergenFree] = useState('');
 
   const [backendItems, setBackendItems] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -163,6 +165,11 @@ const BeverageMenu = () => {
           onSortChange={setSortBy}
           priceRange={priceRange}
           onPriceRangeChange={setPriceRange}
+          showDietaryFilters={true}
+          dietaryType={dietaryType}
+          onDietaryTypeChange={setDietaryType}
+          allergenFree={allergenFree}
+          onAllergenFreeChange={setAllergenFree}
         />
 
         {/* Results Info */}

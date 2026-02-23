@@ -263,9 +263,9 @@
 .auth-submit {
   width: 100%;
   padding: 0.85rem 1.5rem;
-  border: none;
+  border: 1px solid rgba(255, 180, 100, 0.25);
   border-radius: 12px;
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -276,11 +276,14 @@
   gap: 0.6rem;
   transition: transform 0.2s, box-shadow 0.3s;
   margin-top: 0.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .auth-submit:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(232, 126, 30, 0.35);
+  background: rgba(232, 126, 30, 0.95);
+  box-shadow: 0 6px 28px rgba(232, 126, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .auth-submit:active {

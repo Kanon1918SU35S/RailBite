@@ -184,42 +184,44 @@
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: all 0.2s ease;
 }
 
 .ds-btn-pickup {
-    background: rgba(255, 152, 0, 0.15);
+    background: rgba(255, 152, 0, 0.12);
     color: #ff9800;
-    border-color: rgba(255, 152, 0, 0.4);
+    border-color: rgba(255, 152, 0, 0.3);
 }
 
 .ds-btn-pickup:hover {
-    background: rgba(255, 152, 0, 0.28);
-    box-shadow: 0 0 12px rgba(255, 152, 0, 0.2);
+    background: rgba(255, 152, 0, 0.25);
+    box-shadow: 0 0 16px rgba(255, 152, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: translateY(-1px);
 }
 
 .ds-btn-deliver {
-    background: rgba(76, 175, 80, 0.15);
+    background: rgba(76, 175, 80, 0.12);
     color: #4caf50;
-    border-color: rgba(76, 175, 80, 0.4);
+    border-color: rgba(76, 175, 80, 0.3);
 }
 
 .ds-btn-deliver:hover {
-    background: rgba(76, 175, 80, 0.28);
-    box-shadow: 0 0 12px rgba(76, 175, 80, 0.2);
+    background: rgba(76, 175, 80, 0.25);
+    box-shadow: 0 0 16px rgba(76, 175, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: translateY(-1px);
 }
 
 .ds-btn-details {
-    background: rgba(232, 126, 30, 0.12);
+    background: rgba(232, 126, 30, 0.1);
     color: var(--primary-orange);
-    border-color: rgba(232, 126, 30, 0.3);
+    border-color: rgba(232, 126, 30, 0.25);
 }
 
 .ds-btn-details:hover {
-    background: rgba(232, 126, 30, 0.22);
-    box-shadow: 0 0 12px rgba(232, 126, 30, 0.15);
+    background: rgba(232, 126, 30, 0.2);
+    box-shadow: 0 0 16px rgba(232, 126, 30, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: translateY(-1px);
 }
 
@@ -651,14 +653,17 @@
 ========================= */
 
 .ds-back-btn {
-    background: transparent;
-    border: none;
+    background: rgba(232, 126, 30, 0.06);
+    border: 1px solid rgba(232, 126, 30, 0.15);
+    border-radius: 6px;
     color: var(--primary-orange);
     font-size: 0.9rem;
     cursor: pointer;
-    padding: 0;
+    padding: 0.25rem 0.5rem;
     margin-bottom: 0.3rem;
     font-weight: 500;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .ds-back-btn:hover {

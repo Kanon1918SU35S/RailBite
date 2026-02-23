@@ -84,6 +84,14 @@ export const AuthProvider = ({ children }) => {
   };
 
 
+  const updateUser = (updatedFields) => {
+    setUser(prev => {
+      const merged = { ...prev, ...updatedFields };
+      localStorage.setItem('railbiteUser', JSON.stringify(merged));
+      return merged;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('railbiteToken');
@@ -102,6 +110,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
     isAuthenticated,
     loading
   };

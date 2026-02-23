@@ -1,5 +1,5 @@
 /* RAILBITE BD - BUTTONS */
-/* All Button Styles and Variants */
+/* All Button Styles and Variants — with Glassmorphism */
 
 .btn {
   display: inline-block;
@@ -9,22 +9,25 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 1rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-primary {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
-  box-shadow: var(--shadow-orange);
+  box-shadow: var(--shadow-orange), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 180, 100, 0.25);
 }
 
 .btn-primary:hover {
-  background: var(--orange-hover);
+  background: rgba(232, 126, 30, 0.95);
   transform: translateY(-3px);
-  box-shadow: 0 6px 30px rgba(255, 140, 66, 0.6);
+  box-shadow: 0 6px 30px rgba(255, 140, 66, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary::before {
@@ -46,25 +49,33 @@
 }
 
 .btn-secondary {
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 2px solid var(--primary-orange);
+  border: 2px solid rgba(232, 126, 30, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-secondary:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
+  box-shadow: 0 4px 20px rgba(232, 126, 30, 0.35);
+  border-color: rgba(255, 180, 100, 0.3);
 }
 
 .btn-white {
-  background: var(--text-white);
+  background: rgba(255, 255, 255, 0.85);
   color: var(--dark-bg);
   font-weight: 700;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-white:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn-large {
@@ -84,99 +95,121 @@
 
 .btn-logout {
   padding: 0.7rem 1.8rem;
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 2px solid var(--primary-orange);
+  border: 2px solid rgba(232, 126, 30, 0.35);
   border-radius: 25px;
   cursor: pointer;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-logout:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(232, 126, 30, 0.4);
+  box-shadow: 0 5px 24px rgba(232, 126, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 180, 100, 0.3);
 }
 
 .btn-explore {
   padding: 0.6rem 1.2rem;
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
+  border: 1px solid rgba(232, 126, 30, 0.35);
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-explore:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
+  box-shadow: 0 4px 18px rgba(232, 126, 30, 0.35);
+  border-color: rgba(255, 180, 100, 0.25);
 }
 
 .btn-view-details {
   padding: 0.5rem 1rem;
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
+  border: 1px solid rgba(232, 126, 30, 0.35);
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-view-details:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
+  box-shadow: 0 4px 18px rgba(232, 126, 30, 0.35);
+  border-color: rgba(255, 180, 100, 0.25);
 }
 
 .btn-view-all {
   width: 100%;
   padding: 1rem;
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
+  border: 1px solid rgba(232, 126, 30, 0.35);
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-view-all:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
+  box-shadow: 0 4px 18px rgba(232, 126, 30, 0.35);
+  border-color: rgba(255, 180, 100, 0.25);
 }
 
 .btn-reorder {
   padding: 0.6rem 1.5rem;
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
-  border: none;
+  border: 1px solid rgba(255, 180, 100, 0.25);
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-reorder:hover {
-  background: var(--orange-hover);
+  background: rgba(232, 126, 30, 0.95);
   transform: translateY(-2px);
+  box-shadow: 0 5px 22px rgba(232, 126, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-view-receipt {
   padding: 0.6rem 1.5rem;
-  background: transparent;
+  background: rgba(232, 126, 30, 0.08);
   color: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
+  border: 1px solid rgba(232, 126, 30, 0.35);
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-view-receipt:hover {
-  background: var(--primary-orange);
+  background: rgba(232, 126, 30, 0.85);
   color: var(--text-white);
+  box-shadow: 0 4px 18px rgba(232, 126, 30, 0.35);
+  border-color: rgba(255, 180, 100, 0.25);
 }

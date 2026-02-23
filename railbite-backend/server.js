@@ -23,6 +23,9 @@ const deliveryPortalRoutes = require('./routes/deliveryPortalRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const couponRoutes = require('./routes/couponRoutes');
+const trainRoutes = require('./routes/trainRoutes');
+const loyaltyRoutes = require('./routes/loyaltyRoutes');
+const pushRoutes = require('./routes/pushRoutes');
 
 
 dotenv.config();
@@ -59,6 +62,9 @@ app.use('/api/delivery-portal', deliveryPortalRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/trains', trainRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
+app.use('/api/push', pushRoutes);
 
 const PORT = process.env.PORT || 5000;
 

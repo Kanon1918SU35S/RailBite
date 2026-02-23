@@ -19,7 +19,17 @@ const userSchema = new mongoose.Schema(
     },
     // 👉 add these two fields:
     resetPasswordToken: { type: String, default: null },
-    resetPasswordExpire: { type: Date, default: null }
+    resetPasswordExpire: { type: Date, default: null },
+
+    // Web Push subscription
+    pushSubscription: {
+      endpoint: { type: String, default: null },
+      keys: {
+        p256dh: { type: String, default: null },
+        auth: { type: String, default: null }
+      }
+    },
+    pushEnabled: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

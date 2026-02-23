@@ -208,14 +208,16 @@
 
 /* Rate button in order history */
 .btn-rate {
-    background: linear-gradient(135deg, #f5a623, var(--primary-orange));
+    background: linear-gradient(135deg, rgba(245, 166, 35, 0.9), rgba(232, 126, 30, 0.85));
     color: #fff;
-    border: none;
+    border: 1px solid rgba(245, 166, 35, 0.3);
     padding: 0.4rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: opacity 0.2s;
 }
 
@@ -224,13 +226,15 @@
 }
 
 .btn-rated {
-    background: var(--dark-input, #0D0D0D);
+    background: rgba(13, 13, 13, 0.6);
     color: #f5a623;
-    border: 1px solid #f5a623;
+    border: 1px solid rgba(245, 166, 35, 0.35);
     padding: 0.4rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.85rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 /* Responsive */

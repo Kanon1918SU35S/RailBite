@@ -105,6 +105,30 @@ const AdminSidebar = () => {
           <span className="admin-nav-icon">🎟️</span>
           <span>Coupons</span>
         </NavLink>
+
+        <NavLink
+          to="/admin/analytics"
+          className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}
+        >
+          <span className="admin-nav-icon">📉</span>
+          <span>Analytics</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin/trains"
+          className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}
+        >
+          <span className="admin-nav-icon">🚂</span>
+          <span>Trains</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin/loyalty"
+          className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}
+        >
+          <span className="admin-nav-icon">🎖️</span>
+          <span>Loyalty Points</span>
+        </NavLink>
       </nav>
 
       <div className="admin-sidebar-footer">

@@ -10,21 +10,22 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.2rem;
-  background: rgba(26, 26, 26, 0.95);
+  background: rgba(26, 26, 26, 0.75);
   color: var(--text-gray);
-  border: 1px solid var(--border-dark);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   font-weight: 500;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .back-button-fixed:hover {
-  background: var(--dark-card);
+  background: rgba(10, 15, 20, 0.8);
   color: var(--primary-orange);
-  border-color: var(--primary-orange);
+  border-color: rgba(232, 126, 30, 0.3);
   transform: translateX(-3px);
 }
 

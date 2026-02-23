@@ -1,13 +1,18 @@
 import React from 'react';
 
-function SearchFilter({ 
-  searchQuery, 
-  onSearchChange, 
-  sortBy, 
+function SearchFilter({
+  searchQuery,
+  onSearchChange,
+  sortBy,
   onSortChange,
   priceRange,
   onPriceRangeChange,
-  showFilters = true
+  dietaryType,
+  onDietaryTypeChange,
+  allergenFree,
+  onAllergenFreeChange,
+  showFilters = true,
+  showDietaryFilters = true
 }) {
   return (
     <div className="search-filter-container">
@@ -22,7 +27,7 @@ function SearchFilter({
           onChange={(e) => onSearchChange(e.target.value)}
         />
         {searchQuery && (
-          <span 
+          <span
             className="clear-search"
             onClick={() => onSearchChange('')}
             style={{
@@ -64,6 +69,35 @@ function SearchFilter({
               <option value="300+">Above ৳300</option>
             </select>
           </div>
+
+          {/* Dietary Type Filter */}
+          {showDietaryFilters && onDietaryTypeChange && (
+            <div className="filter-group">
+              <label>Dietary</label>
+              <select value={dietaryType || 'all'} onChange={(e) => onDietaryTypeChange(e.target.value)}>
+                <option value="all">All Types</option>
+                <option value="veg">🥬 Vegetarian</option>
+                <option value="non-veg">🍖 Non-Veg</option>
+                <option value="vegan">🌱 Vegan</option>
+                <option value="egg">🥚 Egg</option>
+              </select>
+            </div>
+          )}
+
+          {/* Allergen Filter */}
+          {showDietaryFilters && onAllergenFreeChange && (
+            <div className="filter-group">
+              <label>Allergen Free</label>
+              <select value={allergenFree || 'none'} onChange={(e) => onAllergenFreeChange(e.target.value)}>
+                <option value="none">No Filter</option>
+                <option value="nuts">Nut Free</option>
+                <option value="gluten">Gluten Free</option>
+                <option value="dairy">Dairy Free</option>
+                <option value="eggs">Egg Free</option>
+                <option value="soy">Soy Free</option>
+              </select>
+            </div>
+          )}
         </div>
       )}
     </div>

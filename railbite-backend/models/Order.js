@@ -70,7 +70,25 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null
-    }
+    },
+    // Order tracking history for real-time tracking
+    trackingHistory: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+        message: { type: String, default: '' },
+        updatedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          default: null
+        }
+      }
+    ],
+    // Estimated delivery time (minutes from order confirmation)
+    estimatedDeliveryTime: { type: Number, default: null },
+    // Loyalty points used on this order
+    loyaltyPointsUsed: { type: Number, default: 0 },
+    loyaltyDiscount: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

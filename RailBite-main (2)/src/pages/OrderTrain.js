@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrder } from '../context/OrderContext';
+import { useAuth } from '../context/AuthContext';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
 
 const OrderTrain = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    passengerName: '',
-    phone: '',
+    passengerName: user?.name || '',
+    phone: user?.phone || '',
     trainNumber: '',
     coachNumber: '',
     seatNumber: ''
@@ -65,28 +67,25 @@ const OrderTrain = () => {
           </div>
 
           <form className="booking-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Passenger Name</label>
-              <input
-                type="text"
-                name="passengerName"
-                value={formData.passengerName}
-                onChange={handleChange}
-                placeholder="Enter passenger name"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Phone Number</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="880 1XXX-XXXXXX"
-                required
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>Passenger Name</label>
+                <input
+                  type="text"
+                  value={formData.passengerName}
+                  readOnly
+                  style={{ opacity: 0.7, cursor: 'default' }}
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  readOnly
+                  style={{ opacity: 0.7, cursor: 'default' }}
+                />
+              </div>
             </div>
 
             <div className="form-group">

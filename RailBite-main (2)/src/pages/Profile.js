@@ -6,7 +6,7 @@ import { userAPI } from '../services/api';
 import { orderAPI } from '../services/api';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
   // Stats
@@ -100,16 +100,18 @@ const Profile = () => {
       const res = await userAPI.updateProfile(payload, token);
 
       if (res.data.success) {
-        // Update localStorage with new user info
+        // Update context + localStorage with new user info
         const updatedUser = res.data.user;
-        localStorage.setItem('railbiteUser', JSON.stringify(updatedUser));
+        updateUser(updatedUser);
 
         setSuccessMsg('Profile updated successfully!');
         setEditMode(false);
 
-        // Reset password fields
+        // Sync form data with the new values
         setFormData(prev => ({
           ...prev,
+          name: updatedUser.name || prev.name,
+          phone: updatedUser.phone || prev.phone,
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''

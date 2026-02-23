@@ -563,20 +563,22 @@
 .checkout-place-btn {
   width: 100%;
   padding: 1rem;
-  border: none;
+  border: 1px solid rgba(255, 180, 100, 0.25);
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary-orange), #ff6a00);
+  background: linear-gradient(135deg, rgba(232, 126, 30, 0.9), rgba(255, 106, 0, 0.85));
   color: #fff;
   font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
   margin-top: 1.25rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .checkout-place-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(255, 140, 66, 0.3);
+  box-shadow: 0 6px 28px rgba(255, 140, 66, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .checkout-place-btn:disabled {
@@ -589,18 +591,20 @@
 .checkout-back-btn {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--border-dark);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-gray);
   font-size: 0.9rem;
   cursor: pointer;
   margin-top: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: background 0.2s, color 0.2s;
 }
 
 .checkout-back-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text-white);
 }
 

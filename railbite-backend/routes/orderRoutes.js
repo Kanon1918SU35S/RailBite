@@ -9,7 +9,8 @@ const {
   updateOrderStatus,
   cancelOrder,
   assignDeliveryStaff,
-  getAssignmentStats
+  getAssignmentStats,
+  reorder
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -27,5 +28,6 @@ router.get('/:id', protect, getOrderById);
 router.patch('/:id/status', protect, admin, updateOrderStatus);
 router.post('/:id/assign', protect, admin, assignDeliveryStaff);
 router.patch('/:id/cancel', protect, cancelOrder);
+router.post('/:id/reorder', protect, reorder);
 
 module.exports = router;

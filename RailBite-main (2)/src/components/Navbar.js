@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import NotificationBell from './NotificationBell';
 import UserSidebar from './UserSidebar';
+import LoyaltyPointsBadge from './LoyaltyPointsBadge';
 
 const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -85,6 +86,9 @@ const Navbar = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               {isAuthenticated() && (
                 <>
+                  {/* Loyalty Points Badge */}
+                  <LoyaltyPointsBadge />
+
                   {/* Notification Bell */}
                   <NotificationBell />
 

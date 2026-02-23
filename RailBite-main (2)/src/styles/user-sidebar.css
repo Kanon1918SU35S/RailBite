@@ -259,20 +259,23 @@
     width: 100%;
     padding: 0.75rem;
     border-radius: 25px;
-    border: none;
-    background: var(--primary-orange);
+    border: 1px solid rgba(255, 180, 100, 0.25);
+    background: rgba(232, 126, 30, 0.85);
     color: var(--text-white);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
-    box-shadow: var(--shadow-orange);
+    box-shadow: var(--shadow-orange), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: background 0.2s, transform 0.15s;
 }
 
 .user-sidebar-login-btn:hover {
-    background: var(--orange-hover);
+    background: rgba(232, 126, 30, 0.95);
     transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(232, 126, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* =========================

@@ -58,6 +58,9 @@ import AdminNotifications from './pages/AdminNotifications';
 import AdminContactMessages from './pages/AdminContactMessages';
 import AdminReviewsManagement from './pages/AdminReviewsManagement';
 import AdminCouponManagement from './pages/AdminCouponManagement';
+import AdminAnalytics from './pages/AdminAnalytics';
+import AdminTrainManagement from './pages/AdminTrainManagement';
+import AdminLoyaltyManagement from './pages/AdminLoyaltyManagement';
 
 // Delivery Staff Pages
 import DeliveryStaffLogin from './pages/DeliveryStaffLogin';
@@ -76,6 +79,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import DeliveryStaffProtectedRoute from './components/DeliveryStaffProtectedRoute';
 import ParticleBackground from './components/ParticleBackground';
+
+// Lazy-loaded new feature pages
+import LoyaltyPoints from './pages/LoyaltyPoints';
 
 // Layouts
 const PublicLayout = () => (
@@ -148,6 +154,7 @@ function App() {
                           <Route path="/order-details/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
                           <Route path="/order-tracking/:orderId" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
                           <Route path="/review/:orderId" element={<ProtectedRoute><ReviewOrder /></ProtectedRoute>} />
+                          <Route path="/loyalty" element={<ProtectedRoute><LoyaltyPoints /></ProtectedRoute>} />
                           <Route path="/notifications" element={<Notifications />} />
                           <Route path="/payment-process" element={<ProtectedRoute><PaymentProcess /></ProtectedRoute>} />
                           <Route path="/payment-result" element={<PaymentResult />} />
@@ -188,6 +195,15 @@ function App() {
                           } />
                           <Route path="/admin/coupons" element={
                             <AdminProtectedRoute><AdminCouponManagement /></AdminProtectedRoute>
+                          } />
+                          <Route path="/admin/analytics" element={
+                            <AdminProtectedRoute><AdminAnalytics /></AdminProtectedRoute>
+                          } />
+                          <Route path="/admin/trains" element={
+                            <AdminProtectedRoute><AdminTrainManagement /></AdminProtectedRoute>
+                          } />
+                          <Route path="/admin/loyalty" element={
+                            <AdminProtectedRoute><AdminLoyaltyManagement /></AdminProtectedRoute>
                           } />
                         </Route>
 
