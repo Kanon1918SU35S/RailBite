@@ -12,21 +12,38 @@ const tierColors = {
 export default function AdminLoyaltyManagement() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showBonus, setShowBonus] = useState(false);
+    const [bonusLoading, setBonusLoading] = useState(false);
     const [bonusForm, setBonusForm] = useState({ userId: '', points: '', description: '' });
     const [msg, setMsg] = useState('');
+    const [msgType, setMsgType] = useState('success');
 
     useEffect(() => {
         fetchLoyalty();
     }, []);
 
     const fetchLoyalty = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const token = localStorage.getItem('railbiteToken');
+            const token = localStorage.getItem('railbite_token');
+            if (!token) {
+                setError('Authentication token not found. Please login again.');
+                setLoading(false);
+                return;
+            }
             const res = await loyaltyAPI.getAll(token);
-            setUsers(res.data.data || []);
+            console.log('Loyalty API Response:', res);
+            if (res.data?.data) {
+                setUsers(res.data.data);
+            } else {
+                setError(`No loyalty data received. Response: ${JSON.stringify(res.data)}`);
+            }
         } catch (err) {
             console.error('Error fetching loyalty data:', err);
+            const errorMsg = err.response?.data?.message || err.message || 'Failed to fetch loyalty data';
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -34,19 +51,39 @@ export default function AdminLoyaltyManagement() {
 
     const handleAwardBonus = async (e) => {
         e.preventDefault();
+        if (!bonusForm.userId || !bonusForm.points) {
+            setMsg('Please fill in all required fields');
+            setMsgType('error');
+            return;
+        }
+
+        const points = parseInt(bonusForm.points);
+        if (isNaN(points) || points <= 0) {
+            setMsg('Points must be a valid positive number');
+            setMsgType('error');
+            return;
+        }
+
+        setBonusLoading(true);
         try {
-            const token = localStorage.getItem('railbiteToken');
+            const token = localStorage.getItem('railbite_token');
             await loyaltyAPI.awardBonus({
                 userId: bonusForm.userId,
-                points: parseInt(bonusForm.points),
-                description: bonusForm.description
+                points: points,
+                description: bonusForm.description || 'Admin bonus'
             }, token);
             setMsg('Bonus points awarded successfully!');
+            setMsgType('success');
             setBonusForm({ userId: '', points: '', description: '' });
             setShowBonus(false);
-            fetchLoyalty();
+            setTimeout(() => fetchLoyalty(), 500);
         } catch (err) {
-            setMsg(err.response?.data?.message || 'Error awarding bonus');
+            const errorMsg = err.response?.data?.message || err.message || 'Error awarding bonus';
+            setMsg(errorMsg);
+            setMsgType('error');
+            console.error('Error awarding bonus:', err);
+        } finally {
+            setBonusLoading(false);
         }
     };
 
@@ -65,24 +102,25 @@ export default function AdminLoyaltyManagement() {
                     </button>
                 </div>
 
-                {msg && <div style={styles.msg}>{msg}</div>}
+                {error && <div style={{ ...styles.msg, backgroundColor: 'rgba(244,67,54,0.15)', borderColor: 'rgba(244,67,54,0.4)', color: '#ff9999' }}>{error}</div>}
+                {msg && <div style={{ ...styles.msg, backgroundColor: msgType === 'success' ? 'rgba(76,175,80,0.15)' : 'rgba(244,67,54,0.15)', borderColor: msgType === 'success' ? 'rgba(76,175,80,0.4)' : 'rgba(244,67,54,0.4)', color: msgType === 'success' ? '#a9e9a3' : '#ff9999' }}>{msg}</div>}
 
                 {/* Stats */}
                 <div style={styles.statsGrid}>
                     <div style={styles.statCard}>
-                        <h3>Total Active Points</h3>
+                        <h3 style={{ color: '#ddd', margin: '0 0 0.5rem 0' }}>Total Active Points</h3>
                         <p style={styles.statValue}>{totalPoints.toLocaleString()}</p>
                     </div>
                     <div style={styles.statCard}>
-                        <h3>Total Earned</h3>
-                        <p style={{ ...styles.statValue, color: '#2ecc71' }}>{totalEarned.toLocaleString()}</p>
+                        <h3 style={{ color: '#ddd', margin: '0 0 0.5rem 0' }}>Total Earned</h3>
+                        <p style={{ ...styles.statValue, color: '#4caf50' }}>{totalEarned.toLocaleString()}</p>
                     </div>
                     <div style={styles.statCard}>
-                        <h3>Total Redeemed</h3>
-                        <p style={{ ...styles.statValue, color: '#e74c3c' }}>{totalRedeemed.toLocaleString()}</p>
+                        <h3 style={{ color: '#ddd', margin: '0 0 0.5rem 0' }}>Total Redeemed</h3>
+                        <p style={{ ...styles.statValue, color: '#e87e1e' }}>{totalRedeemed.toLocaleString()}</p>
                     </div>
                     <div style={styles.statCard}>
-                        <h3>Members</h3>
+                        <h3 style={{ color: '#ddd', margin: '0 0 0.5rem 0' }}>Members</h3>
                         <p style={styles.statValue}>{users.length}</p>
                     </div>
                 </div>
@@ -93,7 +131,7 @@ export default function AdminLoyaltyManagement() {
                         <h3>Award Bonus Points</h3>
                         <div style={styles.formRow}>
                             <div style={styles.formGroup}>
-                                <label>Select User</label>
+                                <label>Select User *</label>
                                 <select
                                     value={bonusForm.userId}
                                     onChange={e => setBonusForm({ ...bonusForm, userId: e.target.value })}
@@ -101,15 +139,19 @@ export default function AdminLoyaltyManagement() {
                                     style={styles.input}
                                 >
                                     <option value="">Choose a user...</option>
-                                    {users.map(u => (
-                                        <option key={u._id} value={u.user?._id}>
-                                            {u.user?.name} ({u.user?.email}) - {u.points} pts
-                                        </option>
-                                    ))}
+                                    {users.map(u => {
+                                        const userName = u.userName || u.name || 'Unknown';
+                                        const userEmail = u.userEmail || u.email || '';
+                                        return (
+                                            <option key={u._id} value={u._id}>
+                                                {userName} ({userEmail}) - {u.points || 0} pts
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </div>
                             <div style={styles.formGroup}>
-                                <label>Points to Award</label>
+                                <label>Points to Award *</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -117,6 +159,7 @@ export default function AdminLoyaltyManagement() {
                                     onChange={e => setBonusForm({ ...bonusForm, points: e.target.value })}
                                     required
                                     style={styles.input}
+                                    placeholder="e.g., 100"
                                 />
                             </div>
                             <div style={styles.formGroup}>
@@ -129,13 +172,17 @@ export default function AdminLoyaltyManagement() {
                                 />
                             </div>
                         </div>
-                        <button type="submit" style={styles.submitBtn}>Award Points</button>
+                        <button type="submit" style={styles.submitBtn} disabled={bonusLoading}>
+                            {bonusLoading ? 'Awarding...' : 'Award Points'}
+                        </button>
                     </form>
                 )}
 
                 {/* Users Table */}
                 {loading ? (
-                    <p>Loading...</p>
+                    <p style={styles.loading}>Loading loyalty data...</p>
+                ) : users.length === 0 ? (
+                    <div style={styles.emptyMsg}>No loyalty members found yet. Members are created when users make orders.</div>
                 ) : (
                     <div style={styles.tableWrapper}>
                         <table style={styles.table}>
@@ -150,28 +197,30 @@ export default function AdminLoyaltyManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map(u => (
-                                    <tr key={u._id}>
-                                        <td style={styles.td}>{u.user?.name || 'N/A'}</td>
-                                        <td style={styles.td}>{u.user?.email || 'N/A'}</td>
-                                        <td style={styles.td}>
-                                            <span style={{
-                                                ...styles.tierBadge,
-                                                backgroundColor: `${tierColors[u.tier]}30`,
-                                                color: tierColors[u.tier],
-                                                borderColor: tierColors[u.tier]
-                                            }}>
-                                                {u.tier?.toUpperCase()}
-                                            </span>
-                                        </td>
-                                        <td style={{ ...styles.td, fontWeight: 700 }}>{u.points}</td>
-                                        <td style={{ ...styles.td, color: '#2ecc71' }}>{u.totalEarned}</td>
-                                        <td style={{ ...styles.td, color: '#e74c3c' }}>{u.totalRedeemed}</td>
-                                    </tr>
-                                ))}
-                                {users.length === 0 && (
-                                    <tr><td colSpan={6} style={{ ...styles.td, textAlign: 'center' }}>No loyalty members yet</td></tr>
-                                )}
+                                {users.map(u => {
+                                    const userName = u.userName || u.name || 'Unknown';
+                                    const userEmail = u.userEmail || u.email || 'N/A';
+                                    const tier = u.tier || 'bronze';
+                                    return (
+                                        <tr key={u._id}>
+                                            <td style={styles.td}>{userName}</td>
+                                            <td style={styles.td}>{userEmail}</td>
+                                            <td style={styles.td}>
+                                                <span style={{
+                                                    ...styles.tierBadge,
+                                                    backgroundColor: `${tierColors[tier] || tierColors.bronze}30`,
+                                                    color: tierColors[tier] || tierColors.bronze,
+                                                    borderColor: tierColors[tier] || tierColors.bronze
+                                                }}>
+                                                    {tier.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td style={{ ...styles.td, fontWeight: 700 }}>{u.points || 0}</td>
+                                            <td style={{ ...styles.td, color: '#4caf50' }}>{u.totalEarned || 0}</td>
+                                            <td style={{ ...styles.td, color: '#e87e1e' }}>{u.totalRedeemed || 0}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -182,31 +231,33 @@ export default function AdminLoyaltyManagement() {
 }
 
 const styles = {
-    layout: { display: 'flex', minHeight: '100vh', backgroundColor: '#f5f6fa' },
-    content: { flex: 1, padding: '24px 32px', overflowY: 'auto' },
+    layout: { display: 'flex', minHeight: '100vh', backgroundColor: '#030409' },
+    content: { flex: 1, padding: '2rem 2.5rem', marginLeft: '260px', overflowY: 'auto' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-    title: { fontSize: 26, fontWeight: 700, color: '#1a1a2e' },
+    title: { fontSize: 26, fontWeight: 700, color: '#ffffff' },
     addBtn: {
-        padding: '10px 20px', backgroundColor: '#e74c3c', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600
+        padding: '10px 20px', backgroundColor: '#e87e1e', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600
     },
-    msg: { padding: 12, backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: 8, marginBottom: 16, color: '#155724' },
+    msg: { padding: 12, backgroundColor: 'rgba(76,175,80,0.15)', border: '1px solid rgba(76,175,80,0.4)', borderRadius: 8, marginBottom: 16, color: '#a9e9a3' },
     statsGrid: {
         display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24
     },
     statCard: {
-        background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', textAlign: 'center'
+        background: '#0a0f14', borderRadius: 12, padding: 20, border: '1px solid #2A2A2A', boxShadow: '0 2px 8px rgba(0,0,0,0.3)', textAlign: 'center'
     },
-    statValue: { fontSize: 28, fontWeight: 700, margin: '8px 0 0', color: '#1a1a2e' },
-    form: { background: '#fff', padding: 24, borderRadius: 12, marginBottom: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+    statValue: { fontSize: 28, fontWeight: 700, margin: '8px 0 0', color: '#ffffff' },
+    form: { background: '#0a0f14', padding: 24, borderRadius: 12, marginBottom: 24, border: '1px solid #2A2A2A', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' },
     formRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 },
     formGroup: { marginBottom: 12 },
-    input: { width: '100%', padding: '10px 12px', border: '1px solid #ddd', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' },
+    input: { width: '100%', padding: '10px 12px', border: '1px solid #2A2A2A', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', backgroundColor: '#030409', color: '#ddd' },
     submitBtn: { padding: '10px 20px', backgroundColor: 'rgba(232, 126, 30, 0.85)', color: '#fff', border: '1px solid rgba(255, 180, 100, 0.25)', borderRadius: 8, cursor: 'pointer', fontWeight: 600, marginTop: 8, backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', boxShadow: '0 4px 16px rgba(232, 126, 30, 0.35), inset 0 1px 0 rgba(255,255,255,0.15)' },
-    tableWrapper: { background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+    tableWrapper: { background: '#0a0f14', borderRadius: 12, overflow: 'hidden', border: '1px solid #2A2A2A', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' },
     table: { width: '100%', borderCollapse: 'collapse' },
-    th: { textAlign: 'left', padding: '14px 16px', backgroundColor: '#f8f9fa', fontWeight: 600, fontSize: 13, borderBottom: '2px solid #eee' },
-    td: { padding: '12px 16px', borderBottom: '1px solid #f0f0f0', fontSize: 14 },
+    th: { textAlign: 'left', padding: '14px 16px', backgroundColor: 'rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 13, borderBottom: '2px solid #2A2A2A', color: '#ddd' },
+    td: { padding: '12px 16px', borderBottom: '1px solid #2A2A2A', fontSize: 14, color: '#aaa' },
     tierBadge: {
         display: 'inline-block', padding: '3px 10px', borderRadius: 10, fontSize: 11, fontWeight: 700, border: '1px solid'
-    }
+    },
+    loading: { textAlign: 'center', padding: 40, fontSize: 16, color: '#666' },
+    emptyMsg: { textAlign: 'center', padding: 40, fontSize: 16, color: '#888', backgroundColor: '#0a0f14', borderRadius: 12, border: '1px solid #2A2A2A', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }
 };
