@@ -6,7 +6,10 @@ const {
     redeemPoints,
     earnPointsForOrder,
     getAllLoyalty,
-    awardBonusPoints
+    awardBonusPoints,
+    deductPoints,
+    getLoyaltyStats,
+    getUserLoyaltyDetails
 } = require('../controllers/loyaltyController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -19,7 +22,10 @@ router.post('/redeem', protect, redeemPoints);
 router.post('/earn', protect, earnPointsForOrder);
 
 // Admin routes
+router.get('/admin/stats', protect, admin, getLoyaltyStats);
 router.get('/admin/all', protect, admin, getAllLoyalty);
+router.get('/admin/user/:userId', protect, admin, getUserLoyaltyDetails);
 router.post('/admin/bonus', protect, admin, awardBonusPoints);
+router.post('/admin/deduct', protect, admin, deductPoints);
 
 module.exports = router;
