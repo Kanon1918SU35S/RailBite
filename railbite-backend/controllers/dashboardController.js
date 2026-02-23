@@ -73,6 +73,22 @@ exports.getAnalytics = async (req, res) => {
         startDate.setDate(startDate.getDate() - 7);
     }
 
+    // Summary stats for the selected period
+    const [periodOrdersAgg, periodRevenueAgg, periodOrderCount] = await Promise.all([
+      Order.aggregate([
+        { $match: { createdAt: { $gte: startDate }, status: { $ne: 'cancelled' } } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } }
+      ]),
+      Order.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } }
+      ]),
+      Order.countDocuments({ createdAt: { $gte: startDate } })
+    ]);
+
+    const periodRevenue = periodOrdersAgg.length > 0 ? periodOrdersAgg[0].total : 0;
+    const periodOrders = periodOrderCount;
+
     // Revenue over time (daily)
     const revenueOverTime = await Order.aggregate([
       {
@@ -268,6 +284,10 @@ exports.getAnalytics = async (req, res) => {
     res.json({
       success: true,
       data: {
+        // Period summary
+        periodRevenue,
+        periodOrders,
+        // Detailed analytics
         revenueOverTime,
         ordersByStatus,
         popularItems,
