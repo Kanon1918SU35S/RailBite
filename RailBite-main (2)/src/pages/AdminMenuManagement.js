@@ -17,6 +17,7 @@ const CATEGORIES = [
   { value: 'shwarma', label: 'Shwarma', icon: '🌯' },
   { value: 'smoothie', label: 'Smoothie', icon: '🥤' },
   { value: 'beverage', label: 'Beverage', icon: '🥂' },
+  { value: 'biryani', label: 'Biryani', icon: '🍛' },
 ];
 
 const AdminMenuManagement = () => {
@@ -426,7 +427,7 @@ const AdminMenuManagement = () => {
                       </td>
                       <td>
                         <img
-                          src={item.image ? (item.image.startsWith('/uploads') ? `http://localhost:5001${item.image}` : item.image) : '/images/placeholder.jpg'}
+                          src={item.image ? (item.image.startsWith('/uploads') ? `${(process.env.REACT_APP_API_URL || 'http://localhost:5001/api').replace('/api', '')}${item.image}` : item.image) : '/images/placeholder.jpg'}
                           alt={item.name} className="admin-table-img"
                         />
                       </td>

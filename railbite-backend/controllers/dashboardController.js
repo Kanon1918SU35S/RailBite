@@ -9,6 +9,9 @@ exports.getStats = async (req, res) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
+    const startOfYesterday = new Date(startOfToday);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
     const [
       totalOrders,
       totalRevenueAgg,
@@ -16,7 +19,12 @@ exports.getStats = async (req, res) => {
       pendingOrders,
       deliveredOrders,
       completedToday,
-      deliveryStaffCount
+      deliveryStaffCount,
+      todayOrders,
+      todayRevenueAgg,
+      yesterdayOrders,
+      yesterdayRevenueAgg,
+      yesterdayCompleted
     ] = await Promise.all([
       Order.countDocuments(),
       Order.aggregate([{ $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
@@ -24,10 +32,23 @@ exports.getStats = async (req, res) => {
       Order.countDocuments({ status: 'pending' }),
       Order.countDocuments({ status: 'delivered' }),
       Order.countDocuments({ status: 'delivered', updatedAt: { $gte: startOfToday } }),
-      DeliveryStaff.countDocuments()
+      DeliveryStaff.countDocuments(),
+      Order.countDocuments({ createdAt: { $gte: startOfToday } }),
+      Order.aggregate([
+        { $match: { createdAt: { $gte: startOfToday } } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      ]),
+      Order.countDocuments({ createdAt: { $gte: startOfYesterday, $lt: startOfToday } }),
+      Order.aggregate([
+        { $match: { createdAt: { $gte: startOfYesterday, $lt: startOfToday } } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      ]),
+      Order.countDocuments({ status: 'delivered', updatedAt: { $gte: startOfYesterday, $lt: startOfToday } })
     ]);
 
     const totalRevenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
+    const todayRevenue = todayRevenueAgg.length > 0 ? todayRevenueAgg[0].total : 0;
+    const yesterdayRevenue = yesterdayRevenueAgg.length > 0 ? yesterdayRevenueAgg[0].total : 0;
 
     return res.json({
       success: true,
@@ -38,7 +59,12 @@ exports.getStats = async (req, res) => {
         pendingOrders,
         deliveredOrders,
         completedToday,
-        deliveryStaffCount
+        deliveryStaffCount,
+        todayOrders,
+        todayRevenue,
+        yesterdayOrders,
+        yesterdayRevenue,
+        yesterdayCompleted
       }
     });
   } catch (error) {
@@ -72,22 +98,6 @@ exports.getAnalytics = async (req, res) => {
       default:
         startDate.setDate(startDate.getDate() - 7);
     }
-
-    // Summary stats for the selected period
-    const [periodOrdersAgg, periodRevenueAgg, periodOrderCount] = await Promise.all([
-      Order.aggregate([
-        { $match: { createdAt: { $gte: startDate }, status: { $ne: 'cancelled' } } },
-        { $group: { _id: null, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } }
-      ]),
-      Order.aggregate([
-        { $match: { createdAt: { $gte: startDate } } },
-        { $group: { _id: null, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } }
-      ]),
-      Order.countDocuments({ createdAt: { $gte: startDate } })
-    ]);
-
-    const periodRevenue = periodOrdersAgg.length > 0 ? periodOrdersAgg[0].total : 0;
-    const periodOrders = periodOrderCount;
 
     // Revenue over time (daily)
     const revenueOverTime = await Order.aggregate([
@@ -284,10 +294,6 @@ exports.getAnalytics = async (req, res) => {
     res.json({
       success: true,
       data: {
-        // Period summary
-        periodRevenue,
-        periodOrders,
-        // Detailed analytics
         revenueOverTime,
         ordersByStatus,
         popularItems,

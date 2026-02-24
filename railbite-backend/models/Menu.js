@@ -13,7 +13,7 @@ const menuSchema = new mongoose.Schema(
     category: {
       type: String,
       default: 'general',
-      enum: ['burger', 'pizza', 'shwarma', 'smoothie', 'beverage', 'general']
+      enum: ['burger', 'pizza', 'shwarma', 'smoothie', 'beverage', 'biryani', 'general']
     },
     image: { type: String, default: '' },
     available: { type: Boolean, default: true },

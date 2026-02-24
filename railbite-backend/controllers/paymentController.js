@@ -10,7 +10,7 @@ const SSLCOMMERZ_IS_SANDBOX = process.env.SSLCOMMERZ_SANDBOX === 'true';
 const SSLCOMMERZ_BASE_URL = SSLCOMMERZ_IS_SANDBOX
     ? 'https://sandbox.sslcommerz.com'
     : 'https://securepay.sslcommerz.com';
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 // ─────────────────────────────────────────────

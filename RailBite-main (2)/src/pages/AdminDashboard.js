@@ -70,6 +70,15 @@ const AdminDashboard = () => {
   }, []);
 
 
+  const calcChange = (today, yesterday) => {
+    if (!yesterday || yesterday === 0) {
+      return today > 0 ? '+100%' : '0%';
+    }
+    const pct = ((today - yesterday) / yesterday) * 100;
+    const sign = pct >= 0 ? '+' : '';
+    return `${sign}${pct.toFixed(0)}%`;
+  };
+
   const statsData = useMemo(() => {
     const s = stats || {
       totalOrders: 0,
@@ -77,51 +86,56 @@ const AdminDashboard = () => {
       completedToday: 0,
       totalRevenue: 0,
       activeUsers: 0,
-      deliveryStaffCount: 0
+      deliveryStaffCount: 0,
+      todayOrders: 0,
+      todayRevenue: 0,
+      yesterdayOrders: 0,
+      yesterdayRevenue: 0,
+      yesterdayCompleted: 0
     };
 
     return [
       {
         label: "Today's Orders",
-        value: s.totalOrders,
+        value: s.todayOrders,
         icon: '📦',
         color: '#4ECDC4',
-        change: '+12%'
+        change: calcChange(s.todayOrders, s.yesterdayOrders)
       },
       {
         label: 'Pending Orders',
         value: s.pendingOrders,
         icon: '⏳',
         color: '#FFE66D',
-        change: '+5%'
+        change: null
       },
       {
         label: 'Completed Today',
         value: s.completedToday,
         icon: '✅',
         color: '#95E1D3',
-        change: '+8%'
+        change: calcChange(s.completedToday, s.yesterdayCompleted)
       },
       {
         label: 'Revenue (Today)',
-        value: `৳${s.totalRevenue.toFixed(2)}`,
+        value: `৳${(s.todayRevenue || 0).toFixed(2)}`,
         icon: '💰',
         color: '#FF6B35',
-        change: '+15%'
+        change: calcChange(s.todayRevenue, s.yesterdayRevenue)
       },
       {
-        label: 'Active Users',
+        label: 'Total Users',
         value: s.activeUsers,
         icon: '👥',
         color: '#A8DADC',
-        change: '+3%'
+        change: null
       },
       {
         label: 'Delivery Staff',
         value: s.deliveryStaffCount,
         icon: '🚚',
         color: '#E9C46A',
-        change: '0%'
+        change: null
       }
     ];
   }, [stats]);
@@ -190,9 +204,11 @@ const AdminDashboard = () => {
               <div className="admin-stat-content">
                 <p className="admin-stat-label">{stat.label}</p>
                 <h3 className="admin-stat-value">{stat.value}</h3>
-                <span className="admin-stat-change">
-                  {stat.change} from yesterday
-                </span>
+                {stat.change !== null && (
+                  <span className="admin-stat-change">
+                    {stat.change} from yesterday
+                  </span>
+                )}
               </div>
             </div>
           ))}

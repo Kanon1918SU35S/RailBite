@@ -32,6 +32,7 @@ import PizzaMenu from './pages/PizzaMenu';
 import BurgerMenu from './pages/BurgerMenu';
 import SmoothieMenu from './pages/SmoothieMenu';
 import BeverageMenu from './pages/BeverageMenu';
+import BiryaniMenu from './pages/BiryaniMenu';
 
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -144,6 +145,7 @@ function App() {
                           <Route path="/burger-menu" element={<ProtectedRoute><BurgerMenu /></ProtectedRoute>} />
                           <Route path="/smoothie-menu" element={<ProtectedRoute><SmoothieMenu /></ProtectedRoute>} />
                           <Route path="/beverage-menu" element={<ProtectedRoute><BeverageMenu /></ProtectedRoute>} />
+                          <Route path="/biryani-menu" element={<ProtectedRoute><BiryaniMenu /></ProtectedRoute>} />
 
                           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -155,7 +157,7 @@ function App() {
                           <Route path="/order-tracking/:orderId" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
                           <Route path="/review/:orderId" element={<ProtectedRoute><ReviewOrder /></ProtectedRoute>} />
                           <Route path="/loyalty" element={<ProtectedRoute><LoyaltyPoints /></ProtectedRoute>} />
-                          <Route path="/notifications" element={<Notifications />} />
+                          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                           <Route path="/payment-process" element={<ProtectedRoute><PaymentProcess /></ProtectedRoute>} />
                           <Route path="/payment-result" element={<PaymentResult />} />
                         </Route>
