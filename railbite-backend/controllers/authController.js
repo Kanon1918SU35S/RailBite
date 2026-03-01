@@ -121,9 +121,12 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Send verification email for customers
+    // Send verification email for customers (non-blocking)
     if (userRole === 'customer') {
-      await sendVerificationEmail(user, verificationToken);
+      // Fire-and-forget — don't block the HTTP response
+      sendVerificationEmail(user, verificationToken).catch(err =>
+        console.error('[Register] Failed to send verification email:', err.message)
+      );
       return res.status(201).json({
         success: true,
         message: 'Registration successful! Please check your email to verify your account.',
@@ -204,22 +207,18 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // Send reset email
-    const emailResult = await sendPasswordResetEmail(user, resetToken);
-
-    if (!emailResult.success) {
-      user.resetPasswordToken = null;
-      user.resetPasswordExpire = null;
-      await user.save();
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send reset email. Please try again later.'
-      });
-    }
+    // Send reset email (non-blocking with timeout)
+    sendPasswordResetEmail(user, resetToken)
+      .then(result => {
+        if (!result.success) {
+          console.error('[ForgotPassword] Email send failed:', result.error);
+        }
+      })
+      .catch(err => console.error('[ForgotPassword] Email error:', err.message));
 
     res.json({
       success: true,
-      message: 'Password reset link has been sent to your email address.'
+      message: 'Password reset link sent to your email.'
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -271,8 +270,10 @@ exports.resetPassword = async (req, res) => {
 
     await user.save();
 
-    // Send confirmation email
-    await sendPasswordChangedEmail(user);
+    // Send confirmation email (non-blocking)
+    sendPasswordChangedEmail(user).catch(err =>
+      console.error('[ResetPassword] Failed to send confirmation email:', err.message)
+    );
 
     res.json({
       success: true,
@@ -317,8 +318,10 @@ exports.verifyEmail = async (req, res) => {
     user.emailVerificationExpire = null;
     await user.save();
 
-    // Send welcome email
-    await sendWelcomeEmail(user);
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(user).catch(err =>
+      console.error('[VerifyEmail] Failed to send welcome email:', err.message)
+    );
 
     // Auto-login: generate token
     const authToken = generateToken(user._id);
@@ -380,14 +383,10 @@ exports.resendVerification = async (req, res) => {
     user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24h
     await user.save();
 
-    const emailResult = await sendVerificationEmail(user, verificationToken);
-
-    if (!emailResult.success) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send verification email. Please try again.'
-      });
-    }
+    // Send verification email (non-blocking)
+    sendVerificationEmail(user, verificationToken).catch(err =>
+      console.error('[ResendVerification] Email error:', err.message)
+    );
 
     res.json({
       success: true,

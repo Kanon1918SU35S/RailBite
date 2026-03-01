@@ -31,17 +31,26 @@ const createTransporter = async () => {
     });
   } else {
     // Fallback — Ethereal test account (emails viewable at ethereal.email)
-    const testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass
-      }
-    });
-    console.log('[Email] Using Ethereal test account:', testAccount.user);
+    try {
+      const testAccount = await Promise.race([
+        nodemailer.createTestAccount(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Ethereal timeout')), 5000))
+      ]);
+      transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass
+        }
+      });
+      console.log('[Email] Using Ethereal test account:', testAccount.user);
+    } catch (err) {
+      console.warn('[Email] Ethereal fallback failed:', err.message, '— emails will be skipped');
+      // Create a stub transport that silently discards emails
+      transporter = { sendMail: async () => ({ messageId: 'stub-no-transport' }) };
+    }
   }
 
   return transporter;
