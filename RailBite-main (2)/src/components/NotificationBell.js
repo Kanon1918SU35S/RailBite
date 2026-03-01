@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notificationAPI } from '../services/api';
+import useSocket from '../hooks/useSocket';
 
 function NotificationBell() {
   const [notifications, setNotifications] = useState([]);
@@ -8,11 +9,11 @@ function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
   const navigate = useNavigate();
+  const { socket } = useSocket();
 
   const getToken = () =>
     localStorage.getItem('railbiteToken') ||
     localStorage.getItem('railbite_token') ||
-    localStorage.getItem('railbite_delivery_token') ||
     null;
 
   const fetchNotifications = useCallback(async () => {
@@ -51,6 +52,7 @@ function NotificationBell() {
       alert: '⚠️',
       order: '📦',
       delivery: '🚚',
+      payment: '💳',
       info: 'ℹ️',
       system: '🔧'
     };
@@ -62,6 +64,24 @@ function NotificationBell() {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [fetchNotifications, fetchUnreadCount]);
+
+  // Listen for real-time socket notification events
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNotification = () => {
+      // Re-fetch notifications when a new one arrives via socket
+      fetchNotifications();
+    };
+
+    socket.on('notification', handleNotification);
+    socket.on('newOrder', handleNotification);
+
+    return () => {
+      socket.off('notification', handleNotification);
+      socket.off('newOrder', handleNotification);
+    };
+  }, [socket, fetchNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

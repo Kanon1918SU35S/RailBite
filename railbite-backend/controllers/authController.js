@@ -1,6 +1,12 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const crypto = require('crypto');
+const {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendPasswordChangedEmail,
+  sendWelcomeEmail
+} = require('../utils/emailService');
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -10,6 +16,16 @@ exports.login = async (req, res) => {
 
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    // Check email verification for customers
+    if (user.role === 'customer' && !user.isEmailVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Please verify your email before logging in. Check your inbox for the verification link.',
+        needsVerification: true,
+        email: user.email
+      });
     }
 
     const token = generateToken(user._id);
@@ -22,7 +38,8 @@ exports.login = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
       }
     });
   } catch (error) {
@@ -73,6 +90,13 @@ exports.register = async (req, res) => {
       });
     }
 
+    // Generate email verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto
+      .createHash('sha256')
+      .update(verificationToken)
+      .digest('hex');
+
     // Create new user
     const user = await User.create({
       name,
@@ -80,7 +104,10 @@ exports.register = async (req, res) => {
       phone: phone || '',
       password,
       role: userRole,
-      status: 'active'
+      status: 'active',
+      isEmailVerified: userRole !== 'customer', // Admin/delivery auto-verified
+      emailVerificationToken: userRole === 'customer' ? hashedVerificationToken : null,
+      emailVerificationExpire: userRole === 'customer' ? Date.now() + 24 * 60 * 60 * 1000 : null
     });
 
     // If delivery staff, also create DeliveryStaff profile
@@ -94,6 +121,17 @@ exports.register = async (req, res) => {
       });
     }
 
+    // Send verification email for customers
+    if (userRole === 'customer') {
+      await sendVerificationEmail(user, verificationToken);
+      return res.status(201).json({
+        success: true,
+        message: 'Registration successful! Please check your email to verify your account.',
+        needsVerification: true,
+        email: user.email
+      });
+    }
+
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -104,7 +142,8 @@ exports.register = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
       }
     });
   } catch (error) {
@@ -165,12 +204,22 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // Since no email server, return token directly
+    // Send reset email
+    const emailResult = await sendPasswordResetEmail(user, resetToken);
+
+    if (!emailResult.success) {
+      user.resetPasswordToken = null;
+      user.resetPasswordExpire = null;
+      await user.save();
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send reset email. Please try again later.'
+      });
+    }
+
     res.json({
       success: true,
-      message: 'Reset token generated successfully',
-      resetToken, // plain token shown to user
-      email: user.email
+      message: 'Password reset link has been sent to your email address.'
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -222,9 +271,127 @@ exports.resetPassword = async (req, res) => {
 
     await user.save();
 
+    // Send confirmation email
+    await sendPasswordChangedEmail(user);
+
     res.json({
       success: true,
       message: 'Password reset successfully. You can now login.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// GET /api/auth/verify-email/:token
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token is required'
+      });
+    }
+
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification link. Please request a new one.'
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpire = null;
+    await user.save();
+
+    // Send welcome email
+    await sendWelcomeEmail(user);
+
+    // Auto-login: generate token
+    const authToken = generateToken(user._id);
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully! Your account is now active.',
+      token: authToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isEmailVerified: true
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// POST /api/auth/resend-verification
+exports.resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with that email'
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified. You can login.'
+      });
+    }
+
+    // Generate new token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(verificationToken)
+      .digest('hex');
+
+    user.emailVerificationToken = hashedToken;
+    user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24h
+    await user.save();
+
+    const emailResult = await sendVerificationEmail(user, verificationToken);
+
+    if (!emailResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send verification email. Please try again.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Verification email sent! Please check your inbox.'
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

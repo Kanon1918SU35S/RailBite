@@ -73,7 +73,9 @@ exports.createMenuItem = async (req, res) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/menu/${req.file.filename}`;
+      // Store image as base64 data URI in MongoDB (Render filesystem is ephemeral)
+      const base64 = req.file.buffer.toString('base64');
+      data.image = `data:${req.file.mimetype};base64,${base64}`;
     }
     // Ensure price is a number
     if (data.price) data.price = parseFloat(data.price);
@@ -95,7 +97,9 @@ exports.updateMenuItem = async (req, res) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/menu/${req.file.filename}`;
+      // Store image as base64 data URI in MongoDB (Render filesystem is ephemeral)
+      const base64 = req.file.buffer.toString('base64');
+      data.image = `data:${req.file.mimetype};base64,${base64}`;
     }
     if (data.price) data.price = parseFloat(data.price);
     if (typeof data.available === 'string') {

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const {
   getAllMenu,
   getMenuBySection,
@@ -17,19 +16,9 @@ const {
 } = require('../controllers/menuController');
 const { protect, admin } = require('../middleware/auth');
 
-// Multer config for menu images
-const uploadDir = path.join(__dirname, '..', 'uploads', 'menu');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const uniqueName = `menu-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
+// Multer config — use memoryStorage so images are stored as base64 in MongoDB
+// (Render's filesystem is ephemeral; local files are lost on restart)
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|gif|webp/;
@@ -39,14 +28,15 @@ const fileFilter = (req, file, cb) => {
   cb(new Error('Only image files (jpg, png, gif, webp) are allowed'));
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 20 * 1024 * 1024 } });
+// 5 MB limit (base64 ≈ 1.33× → ~6.7 MB, well within MongoDB's 16 MB doc limit)
+const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Multer error handler wrapper
 const handleUpload = (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
       if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ success: false, message: 'Image too large. Maximum size is 20 MB.' });
+        return res.status(400).json({ success: false, message: 'Image too large. Maximum size is 5 MB.' });
       }
       return res.status(400).json({ success: false, message: err.message });
     }

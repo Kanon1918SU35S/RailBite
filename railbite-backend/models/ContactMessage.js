@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const contactMessageSchema = new mongoose.Schema(
   {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     name: { type: String, required: true },
     email: { type: String, required: true },
     message: { type: String, required: true },

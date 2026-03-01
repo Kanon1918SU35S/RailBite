@@ -1,24 +1,37 @@
 const ContactMessage = require('../models/ContactMessage');
+const { sendContactConfirmationEmail } = require('../utils/emailService');
 
-// POST /api/contact - customer sends message (public)
+// POST /api/contact - logged-in user sends message (requires auth)
 exports.sendMessage = async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const { message } = req.body;
 
-    if (!name || !email || !message) {
+    if (!message) {
       return res.status(400).json({
         success: false,
-        message: 'Name, email and message are required'
+        message: 'Message is required'
       });
     }
 
-    const contact = await ContactMessage.create({ name, email, message });
+    const contact = await ContactMessage.create({
+      user: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      message
+    });
 
     res.status(201).json({
       success: true,
       message: 'Message sent successfully. We will contact you soon.',
       data: contact
     });
+
+    // Send confirmation email to the user (async)
+    try {
+      await sendContactConfirmationEmail(req.user.name, req.user.email);
+    } catch (emailErr) {
+      console.error('[Email] Contact confirmation email failed:', emailErr.message);
+    }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

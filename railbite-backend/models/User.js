@@ -17,7 +17,11 @@ const userSchema = new mongoose.Schema(
       enum: ['active', 'blocked'],
       default: 'active'
     },
-    // 👉 add these two fields:
+    // Email verification
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: null },
+    emailVerificationExpire: { type: Date, default: null },
+    // Password reset
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpire: { type: Date, default: null },
 

@@ -6,6 +6,7 @@ const LoyaltyPoints = require('../models/LoyaltyPoints');
 const { createNotification } = require('./notificationController');
 const { sendPushNotification } = require('../utils/pushNotification');
 const { emitOrderUpdate, emitNewOrder, emitNotification, emitRoleNotification } = require('../sockets/orderSocket');
+const { sendOrderConfirmationEmail, sendOrderStatusEmail } = require('../utils/emailService');
 
 // GET /api/orders - all orders (admin)
 exports.getAllOrders = async (req, res) => {
@@ -110,6 +111,10 @@ exports.createOrder = async (req, res) => {
       targetUser: req.user._id,
       relatedOrder: order._id
     });
+    emitNotification(req.user._id.toString(), {
+      type: 'order', title: 'Order Placed Successfully',
+      message: `Your order ${orderNumber} has been placed and is pending confirmation.`
+    });
 
     // Auto-notify: admin gets new order alert
     await createNotification({
@@ -119,6 +124,10 @@ exports.createOrder = async (req, res) => {
       targetRole: 'admin',
       relatedOrder: order._id
     });
+    emitRoleNotification('admin', {
+      type: 'order', title: 'New Order Received',
+      message: `New order ${orderNumber} placed by ${req.user.name || 'a customer'}. Total: ৳${total}`
+    });
 
     res.status(201).json({
       success: true,
@@ -127,6 +136,16 @@ exports.createOrder = async (req, res) => {
         orderId: order.orderNumber
       }
     });
+
+    // Send order confirmation email (async, don't block response)
+    try {
+      const customer = await User.findById(req.user._id).select('name email');
+      if (customer) {
+        await sendOrderConfirmationEmail(customer, order);
+      }
+    } catch (emailErr) {
+      console.error('[Email] Order confirmation email failed:', emailErr.message);
+    }
 
     // Emit real-time events (after response sent)
     emitNewOrder({
@@ -150,6 +169,22 @@ exports.updateOrderStatus = async (req, res) => {
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Admin cannot mark orders as delivered — only delivery staff can via the delivery portal
+    if (status === 'delivered') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only delivery staff can mark an order as delivered. Please wait for the delivery partner to confirm delivery.'
+      });
+    }
+
+    // "Preparing" requires delivery staff to be assigned first
+    if (status === 'preparing' && !order.assignedTo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please assign a delivery staff before marking the order as preparing.'
+      });
     }
 
     const oldStatus = order.status;
@@ -199,13 +234,14 @@ exports.updateOrderStatus = async (req, res) => {
 
     // Auto-notify: tell the customer about status change
     const statusLabels = {
-      confirmed: 'confirmed and is being prepared',
+      confirmed: 'confirmed',
       preparing: 'being prepared',
-      on_the_way: 'on the way',
+      on_the_way: 'dispatched and on the way',
       delivered: 'delivered',
       cancelled: 'cancelled'
     };
     if (status && statusLabels[status]) {
+      // Notify customer
       await createNotification({
         type: 'order',
         title: `Order ${status === 'cancelled' ? 'Cancelled' : 'Update'}`,
@@ -213,6 +249,34 @@ exports.updateOrderStatus = async (req, res) => {
         targetUser: order.user,
         relatedOrder: order._id
       });
+      emitNotification(order.user.toString(), {
+        type: 'order',
+        title: `Order ${status === 'cancelled' ? 'Cancelled' : 'Update'}`,
+        message: `Your order ${order.orderNumber} has been ${statusLabels[status]}.`
+      });
+
+      // Notify delivery staff about relevant status changes
+      if (order.assignedTo) {
+        const staffStatusMessages = {
+          preparing: `Order ${order.orderNumber} is now being prepared. Get ready for pickup.`,
+          on_the_way: `Order ${order.orderNumber} has been dispatched. Head out for delivery now!`,
+          cancelled: `Order ${order.orderNumber} has been cancelled by admin.`
+        };
+        if (staffStatusMessages[status]) {
+          await createNotification({
+            type: 'delivery',
+            title: status === 'cancelled' ? 'Order Cancelled' : 'Order Update',
+            message: staffStatusMessages[status],
+            targetUser: order.assignedTo,
+            relatedOrder: order._id
+          });
+          emitNotification(order.assignedTo.toString(), {
+            type: 'delivery',
+            title: status === 'cancelled' ? 'Order Cancelled' : 'Order Update',
+            message: staffStatusMessages[status]
+          });
+        }
+      }
 
       // Send browser push notification to the customer
       try {
@@ -245,6 +309,18 @@ exports.updateOrderStatus = async (req, res) => {
       .populate('assignedTo', 'name email');
 
     res.json({ success: true, data: updated });
+
+    // Send status update email to customer (async, don't block response)
+    if (status && statusLabels[status]) {
+      try {
+        const customer = await User.findById(order.user).select('name email');
+        if (customer) {
+          await sendOrderStatusEmail(customer, order, status);
+        }
+      } catch (emailErr) {
+        console.error('[Email] Order status email failed:', emailErr.message);
+      }
+    }
 
     // Emit real-time order status update
     emitOrderUpdate(order._id.toString(), order.user.toString(), {
@@ -329,6 +405,10 @@ exports.assignDeliveryStaff = async (req, res) => {
       targetUser: staff.userId,
       relatedOrder: order._id
     });
+    emitNotification(staff.userId.toString(), {
+      type: 'delivery', title: 'New Delivery Assigned',
+      message: `Order ${order.orderNumber} has been assigned to you for delivery.`
+    });
 
     // Notify customer
     await createNotification({
@@ -338,6 +418,10 @@ exports.assignDeliveryStaff = async (req, res) => {
       targetUser: order.user,
       relatedOrder: order._id
     });
+    emitNotification(order.user.toString(), {
+      type: 'order', title: 'Delivery Staff Assigned',
+      message: `A delivery partner has been assigned to your order ${order.orderNumber}.`
+    });
 
     // Notify admin
     await createNotification({
@@ -346,6 +430,10 @@ exports.assignDeliveryStaff = async (req, res) => {
       message: `${staff.name} has been assigned to order ${order.orderNumber}.`,
       targetRole: 'admin',
       relatedOrder: order._id
+    });
+    emitRoleNotification('admin', {
+      type: 'delivery', title: 'Staff Assigned to Order',
+      message: `${staff.name} has been assigned to order ${order.orderNumber}.`
     });
 
     // Return populated order
@@ -500,6 +588,38 @@ exports.cancelOrder = async (req, res) => {
       message: `Order ${order.orderNumber} has been cancelled by the customer.`,
       targetRole: 'admin',
       relatedOrder: order._id
+    });
+    emitRoleNotification('admin', {
+      type: 'order', title: 'Order Cancelled',
+      message: `Order ${order.orderNumber} has been cancelled by the customer.`
+    });
+
+    // Notify delivery staff if assigned
+    if (order.assignedTo) {
+      await createNotification({
+        type: 'delivery',
+        title: 'Order Cancelled',
+        message: `Order ${order.orderNumber} has been cancelled by the customer. This delivery has been removed from your queue.`,
+        targetUser: order.assignedTo,
+        relatedOrder: order._id
+      });
+      emitNotification(order.assignedTo.toString(), {
+        type: 'delivery', title: 'Order Cancelled',
+        message: `Order ${order.orderNumber} has been cancelled by the customer.`
+      });
+    }
+
+    // Notify customer about their cancellation
+    await createNotification({
+      type: 'order',
+      title: 'Order Cancelled',
+      message: `Your order ${order.orderNumber} has been cancelled successfully.`,
+      targetUser: order.user,
+      relatedOrder: order._id
+    });
+    emitNotification(order.user.toString(), {
+      type: 'order', title: 'Order Cancelled',
+      message: `Your order ${order.orderNumber} has been cancelled successfully.`
     });
 
     res.json({ success: true, data: order });

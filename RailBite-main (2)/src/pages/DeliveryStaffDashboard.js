@@ -236,22 +236,18 @@ const DeliveryStaffDashboard = () => {
                                         </div>
 
                                         <div className="ds-order-actions">
-                                            {order.status === 'confirmed' || order.status === 'preparing' ? (
-                                                <button
-                                                    className="ds-btn ds-btn-pickup"
-                                                    onClick={() => handleUpdateStatus(order._id, 'picked_up')}
-                                                >
-                                                    🏃 Pick Up
-                                                </button>
-                                            ) : null}
                                             {order.status === 'on_the_way' ? (
                                                 <button
                                                     className="ds-btn ds-btn-deliver"
                                                     onClick={() => handleUpdateStatus(order._id, 'delivered')}
                                                 >
-                                                    ✅ Mark Delivered
+                                                    ✅ Confirm Delivery
                                                 </button>
-                                            ) : null}
+                                            ) : (
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--text-gray)', fontStyle: 'italic' }}>
+                                                    ⏳ Waiting for dispatch
+                                                </span>
+                                            )}
                                             <button
                                                 className="ds-btn ds-btn-details"
                                                 onClick={() => navigate(`/delivery/order/${order._id}`)}

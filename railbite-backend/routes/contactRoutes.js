@@ -8,7 +8,7 @@ const {
 } = require('../controllers/contactController');
 const { protect, admin } = require('../middleware/auth');
 
-router.post('/', sendMessage);
+router.post('/', protect, sendMessage);
 router.get('/', protect, admin, getAllMessages);
 router.patch('/:id/status', protect, admin, updateStatus);
 router.delete('/:id', protect, admin, deleteMessage);

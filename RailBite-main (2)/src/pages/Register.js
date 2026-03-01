@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
 import Toast from '../components/Toast';
 
 const Register = () => {
@@ -15,6 +16,9 @@ const Register = () => {
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [resending, setResending] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -52,6 +56,12 @@ const Register = () => {
       setLoading(true);
       const result = await register(fullName, email, phone, password, role);
       if (result.success) {
+        // If email verification required
+        if (result.needsVerification) {
+          setVerificationSent(true);
+          setVerificationEmail(result.email || email);
+          return;
+        }
         setToast({ message: 'Registration successful!', type: 'success' });
         setTimeout(() => {
           if (role === 'delivery') { navigate('/delivery/login'); return; }
@@ -80,6 +90,42 @@ const Register = () => {
           <img src="/images/logo.png" alt="RailBite" className="lg-top-logo" onError={(e) => { e.target.style.display = 'none'; }} />
 
           <div className={`lg-card ${shake ? 'lg-card--shake' : ''}`}>
+            {verificationSent ? (
+              <>
+                <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                  <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📧</div>
+                  <h2 className="lg-card__title">Check Your Email</h2>
+                  <p className="lg-card__sub" style={{ marginBottom: '1.2rem' }}>
+                    We've sent a verification link to<br />
+                    <strong style={{ color: '#f97316' }}>{verificationEmail}</strong>
+                  </p>
+                  <p style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+                    Click the link in the email to verify your account. Check your spam folder if you don't see it.
+                  </p>
+                  <button
+                    type="button"
+                    className="lg-submit"
+                    disabled={resending}
+                    onClick={async () => {
+                      try {
+                        setResending(true);
+                        await authAPI.resendVerification(verificationEmail);
+                        setToast({ message: 'Verification email resent!', type: 'success' });
+                      } catch {
+                        setToast({ message: 'Failed to resend. Try again later.', type: 'error' });
+                      } finally { setResending(false); }
+                    }}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {resending ? <span className="lg-submit__spinner" /> : 'Resend Verification Email'}
+                  </button>
+                  <p className="lg-switch">
+                    <Link to="/login">Back to Login</Link>
+                  </p>
+                </div>
+              </>
+            ) : (
+            <>
             <h2 className="lg-card__title">Create Account</h2>
             <p className="lg-card__sub">Join RailBite and order food on the go</p>
 
@@ -165,6 +211,8 @@ const Register = () => {
             <p className="lg-switch">
               Already have an account? <Link to="/login">Sign in</Link>
             </p>
+            </>
+            )}
           </div>
         </div>
       </div>

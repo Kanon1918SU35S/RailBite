@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
 import Toast from '../components/Toast';
 
 const Login = () => {
@@ -13,6 +14,9 @@ const Login = () => {
   const [mounted, setMounted] = useState(false);
   const [shake, setShake] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [resending, setResending] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -37,6 +41,9 @@ const Login = () => {
           if (intended) { localStorage.removeItem('railbiteIntendedUrl'); navigate(intended); }
           else navigate('/order-selection');
         }, 1000);
+      } else if (result.needsVerification) {
+        setNeedsVerification(true);
+        setVerificationEmail(result.email || email);
       } else {
         setToast({ message: result.message || 'Login failed', type: 'error' });
         triggerShake();
@@ -60,6 +67,40 @@ const Login = () => {
           <img src="/images/logo.png" alt="RailBite" className="lg-top-logo" onError={(e) => { e.target.style.display = 'none'; }} />
 
           <div className={`lg-card ${shake ? 'lg-card--shake' : ''}`}>
+            {needsVerification ? (
+              <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📧</div>
+                <h2 className="lg-card__title">Email Not Verified</h2>
+                <p className="lg-card__sub" style={{ marginBottom: '1.2rem' }}>
+                  Please verify your email before logging in.<br />
+                  <strong style={{ color: '#f97316' }}>{verificationEmail}</strong>
+                </p>
+                <p style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+                  Check your inbox (and spam folder) for the verification link we sent you.
+                </p>
+                <button
+                  type="button"
+                  className="lg-submit"
+                  disabled={resending}
+                  onClick={async () => {
+                    try {
+                      setResending(true);
+                      await authAPI.resendVerification(verificationEmail);
+                      setToast({ message: 'Verification email resent!', type: 'success' });
+                    } catch {
+                      setToast({ message: 'Failed to resend. Try again later.', type: 'error' });
+                    } finally { setResending(false); }
+                  }}
+                  style={{ marginBottom: '1rem' }}
+                >
+                  {resending ? <span className="lg-submit__spinner" /> : 'Resend Verification Email'}
+                </button>
+                <p className="lg-switch">
+                  <span style={{ cursor: 'pointer', color: '#f97316' }} onClick={() => setNeedsVerification(false)}>Back to Login</span>
+                </p>
+              </div>
+            ) : (
+            <>
             <h2 className="lg-card__title">Welcome back</h2>
             <p className="lg-card__sub">Sign in to continue your journey</p>
 
@@ -151,6 +192,8 @@ const Login = () => {
             <p className="lg-switch">
               Don't have an account? <Link to="/register">Create one</Link>
             </p>
+            </>
+            )}
           </div>
         </div>
       </div>

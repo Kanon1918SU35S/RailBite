@@ -3,6 +3,8 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const DeliveryStaff = require('../models/DeliveryStaff');
 const { createNotification } = require('./notificationController');
+const { emitOrderUpdate, emitNotification, emitRoleNotification } = require('../sockets/orderSocket');
+const { sendOrderStatusEmail } = require('../utils/emailService');
 
 // Helper: get or create DeliveryStaff profile linked to the logged-in user
 const getOrCreateProfile = async (user) => {
@@ -297,83 +299,97 @@ exports.updateDeliveryStatus = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized to update this order' });
         }
 
-        // Map frontend status values to the Order model's enum values
-        const statusMap = {
-            'picked_up': 'on_the_way',
-            'on the way': 'on_the_way',
-            'delivered': 'delivered'
-        };
+        // Delivery staff can only mark dispatched orders as delivered
+        // (Admin handles: confirmed → preparing → on_the_way/dispatched)
+        if (status !== 'delivered') {
+            return res.status(400).json({
+                success: false,
+                message: 'You can only mark dispatched orders as delivered.'
+            });
+        }
 
-        const mappedStatus = statusMap[status] || status;
+        if (order.status !== 'on_the_way') {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot mark as delivered. Order must be dispatched first (current status: ${order.status}).`
+            });
+        }
 
         // Update main order status
-        order.status = mappedStatus;
-
-        // Also update deliveryStatus for compatibility
-        if (status === 'picked_up' || status === 'on the way' || mappedStatus === 'on_the_way') {
-            order.deliveryStatus = 'sent';
-        } else if (mappedStatus === 'delivered') {
-            order.deliveryStatus = 'delivered';
-        }
+        order.status = 'delivered';
+        order.deliveryStatus = 'delivered';
 
         await order.save();
 
-        // If delivered, update the delivery staff profile stats
-        if (mappedStatus === 'delivered') {
-            const staffProfile = await DeliveryStaff.findOne({ userId: req.user._id });
-            if (staffProfile) {
-                // Use live count for accuracy (not stale counters)
-                const remainingActive = await Order.countDocuments({
-                    assignedTo: req.user._id,
-                    status: { $nin: ['delivered', 'cancelled'] }
-                });
-                const todayStart = new Date();
-                todayStart.setHours(0, 0, 0, 0);
-                const liveCompletedToday = await Order.countDocuments({
-                    assignedTo: req.user._id,
-                    status: 'delivered',
-                    updatedAt: { $gte: todayStart }
-                });
-                const liveTotalDeliveries = await Order.countDocuments({
-                    assignedTo: req.user._id,
-                    status: 'delivered'
-                });
-
-                staffProfile.totalDeliveries = liveTotalDeliveries;
-                staffProfile.completedToday = liveCompletedToday;
-                staffProfile.assignedOrders = remainingActive;
-                staffProfile.status = remainingActive === 0 ? 'available' : 'busy';
-                await staffProfile.save();
-            }
-
-            // Notify customer that order is delivered
-            await createNotification({
-                type: 'order',
-                title: 'Order Delivered!',
-                message: `Your order ${order.orderNumber} has been delivered. Enjoy your meal!`,
-                targetUser: order.user,
-                relatedOrder: order._id
+        // Update the delivery staff profile stats
+        const staffProfile = await DeliveryStaff.findOne({ userId: req.user._id });
+        if (staffProfile) {
+            // Use live count for accuracy (not stale counters)
+            const remainingActive = await Order.countDocuments({
+                assignedTo: req.user._id,
+                status: { $nin: ['delivered', 'cancelled'] }
+            });
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const liveCompletedToday = await Order.countDocuments({
+                assignedTo: req.user._id,
+                status: 'delivered',
+                updatedAt: { $gte: todayStart }
+            });
+            const liveTotalDeliveries = await Order.countDocuments({
+                assignedTo: req.user._id,
+                status: 'delivered'
             });
 
-            // Notify admin about completed delivery
-            await createNotification({
-                type: 'delivery',
-                title: 'Delivery Completed',
-                message: `Order ${order.orderNumber} has been delivered by ${req.user.name || 'delivery staff'}.`,
-                targetRole: 'admin',
-                relatedOrder: order._id
-            });
+            staffProfile.totalDeliveries = liveTotalDeliveries;
+            staffProfile.completedToday = liveCompletedToday;
+            staffProfile.assignedOrders = remainingActive;
+            staffProfile.status = remainingActive === 0 ? 'available' : 'busy';
+            await staffProfile.save();
         }
 
-        // Notify customer about delivery status update (picked up / on the way)
-        if (mappedStatus === 'on_the_way') {
-            await createNotification({
-                type: 'order',
-                title: 'Order On The Way!',
-                message: `Your order ${order.orderNumber} is on the way to you.`,
-                targetUser: order.user,
-                relatedOrder: order._id
-            });
+        // Notify customer that order is delivered
+        await createNotification({
+            type: 'order',
+            title: 'Order Delivered!',
+            message: `Your order ${order.orderNumber} has been delivered. Enjoy your meal!`,
+            targetUser: order.user,
+            relatedOrder: order._id
+        });
+        emitNotification(order.user.toString(), {
+            type: 'order', title: 'Order Delivered!',
+            message: `Your order ${order.orderNumber} has been delivered. Enjoy your meal!`
+        });
+
+        // Notify admin about completed delivery
+        await createNotification({
+            type: 'delivery',
+            title: 'Delivery Completed',
+            message: `Order ${order.orderNumber} has been delivered by ${req.user.name || 'delivery staff'}.`,
+            targetRole: 'admin',
+            relatedOrder: order._id
+        });
+        emitRoleNotification('admin', {
+            type: 'delivery', title: 'Delivery Completed',
+            message: `Order ${order.orderNumber} has been delivered by ${req.user.name || 'delivery staff'}.`
+        });
+
+        // Emit order status update to all tracking parties
+        emitOrderUpdate(order._id.toString(), order.user.toString(), {
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            status: 'delivered',
+            deliveryStatus: 'delivered'
+        });
+
+        // Send delivered email to customer
+        try {
+            const customer = await User.findById(order.user).select('name email');
+            if (customer) {
+                await sendOrderStatusEmail(customer, order, 'delivered');
+            }
+        } catch (emailErr) {
+            console.error('[Email] Delivered email failed:', emailErr.message);
         }
 
         res.json({ success: true, data: order });

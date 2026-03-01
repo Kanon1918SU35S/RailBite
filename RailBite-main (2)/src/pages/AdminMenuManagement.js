@@ -539,7 +539,7 @@ const AdminMenuManagement = () => {
                   />
                   {imagePreview && (
                     <div className="admin-image-preview">
-                      <img src={imagePreview.startsWith('blob:') ? imagePreview : `http://localhost:5001${imagePreview}`} alt="Preview" />
+                      <img src={imagePreview.startsWith('blob:') || imagePreview.startsWith('data:') || imagePreview.startsWith('http') ? imagePreview : `${(process.env.REACT_APP_API_URL || 'http://localhost:5001/api').replace('/api', '')}${imagePreview}`} alt="Preview" />
                     </div>
                   )}
                 </div>

@@ -2,7 +2,9 @@ const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
 const { createNotification } = require('./notificationController');
-const { emitOrderUpdate } = require('../sockets/orderSocket');
+const { emitOrderUpdate, emitNotification, emitRoleNotification } = require('../sockets/orderSocket');
+const { sendPaymentConfirmationEmail } = require('../utils/emailService');
+const User = require('../models/User');
 
 const SSLCOMMERZ_STORE_ID = process.env.SSLCOMMERZ_STORE_ID || 'your_store_id';
 const SSLCOMMERZ_STORE_PASSWORD = process.env.SSLCOMMERZ_STORE_PASSWORD || 'your_store_password';
@@ -195,6 +197,37 @@ exports.paymentSuccess = async (req, res) => {
                 targetUser: order.user,
                 relatedOrder: order._id
             });
+            emitNotification(order.user.toString(), {
+                type: 'payment', title: 'Payment Successful',
+                message: `Payment of ৳${amount} for order ${order.orderNumber} was successful.`
+            });
+
+            // Notify admin about payment
+            await createNotification({
+                type: 'payment',
+                title: 'Payment Received',
+                message: `Payment of ৳${amount} received for order ${order.orderNumber}.`,
+                targetRole: 'admin',
+                relatedOrder: order._id
+            });
+            emitRoleNotification('admin', {
+                type: 'payment', title: 'Payment Received',
+                message: `Payment of ৳${amount} received for order ${order.orderNumber}.`
+            });
+
+            // Send payment confirmation email
+            try {
+                const customer = await User.findById(order.user).select('name email');
+                if (customer) {
+                    await sendPaymentConfirmationEmail(customer, order, {
+                        amount: parseFloat(amount),
+                        method: card_brand || 'Online',
+                        transactionId: tran_id
+                    });
+                }
+            } catch (emailErr) {
+                console.error('[Email] Payment email failed:', emailErr.message);
+            }
         }
 
         res.redirect(`${FRONTEND_URL}/payment-result?status=success&order=${order?.orderNumber}&tran_id=${tran_id}`);
@@ -336,6 +369,37 @@ exports.confirmDevPayment = async (req, res) => {
                 targetUser: order.user,
                 relatedOrder: order._id
             });
+            emitNotification(order.user.toString(), {
+                type: 'payment', title: 'Payment Successful',
+                message: `Payment of ৳${payment.amount} for order ${order.orderNumber} confirmed.`
+            });
+
+            // Notify admin about payment
+            await createNotification({
+                type: 'payment',
+                title: 'Payment Received',
+                message: `Payment of ৳${payment.amount} received for order ${order.orderNumber}.`,
+                targetRole: 'admin',
+                relatedOrder: order._id
+            });
+            emitRoleNotification('admin', {
+                type: 'payment', title: 'Payment Received',
+                message: `Payment of ৳${payment.amount} received for order ${order.orderNumber}.`
+            });
+
+            // Send payment confirmation email
+            try {
+                const customer = await User.findById(order.user).select('name email');
+                if (customer) {
+                    await sendPaymentConfirmationEmail(customer, order, {
+                        amount: payment.amount,
+                        method: 'Online (Dev)',
+                        transactionId
+                    });
+                }
+            } catch (emailErr) {
+                console.error('[Email] Payment email failed:', emailErr.message);
+            }
         }
 
         res.json({

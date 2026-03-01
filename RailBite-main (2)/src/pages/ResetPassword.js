@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import Toast from '../components/Toast';
@@ -7,8 +7,13 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Pre-fill token if coming from ForgotPassword page
-  const [token, setToken] = useState(location.state?.token || '');
+  // Read token from URL query params (?token=xxx) or from navigation state
+  const urlToken = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('token') || '';
+  }, [location.search]);
+
+  const [token, setToken] = useState(urlToken || location.state?.token || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -78,11 +83,12 @@ const ResetPassword = () => {
 
         <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Reset Password</h2>
         <p style={{ color: 'var(--text-gray)', marginBottom: '2rem' }}>
-          Enter your reset token and new password below.
+          {token ? 'Enter your new password below.' : 'Enter your reset token and new password below.'}
         </p>
 
         <form onSubmit={handleSubmit}>
-          {/* Token field - pre-filled if coming from ForgotPassword */}
+          {/* Token field - hidden when pre-filled from email link */}
+          {!urlToken && (
           <div className="form-group">
             <label>Reset Token</label>
             <input
@@ -93,6 +99,7 @@ const ResetPassword = () => {
               required
             />
           </div>
+          )}
 
           <div className="form-group">
             <label>New Password</label>

@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDeliveryStaff } from '../context/DeliveryStaffContext';
+import { notificationAPI } from '../services/api';
 
 const DeliveryStaffSidebar = () => {
     const { staffLogout, staffUser } = useDeliveryStaff();
     const navigate = useNavigate();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    const fetchUnreadCount = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('railbite_delivery_token');
+            if (!token) return;
+            const res = await notificationAPI.getUnreadCount(token);
+            if (res.data.success) setUnreadCount(res.data.data.count);
+        } catch (err) { /* silent */ }
+    }, []);
+
+    useEffect(() => {
+        fetchUnreadCount();
+        const interval = setInterval(fetchUnreadCount, 15000);
+        return () => clearInterval(interval);
+    }, [fetchUnreadCount]);
 
     const handleLogout = () => {
         staffLogout();
@@ -71,6 +88,20 @@ const DeliveryStaffSidebar = () => {
                 >
                     <span className="admin-nav-icon">🔔</span>
                     <span>Notifications</span>
+                    {unreadCount > 0 && (
+                        <span style={{
+                            marginLeft: 'auto',
+                            background: '#f44336',
+                            color: '#fff',
+                            borderRadius: '10px',
+                            padding: '2px 8px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            minWidth: '20px',
+                            textAlign: 'center',
+                            lineHeight: '1.3'
+                        }}>{unreadCount > 99 ? '99+' : unreadCount}</span>
+                    )}
                 </NavLink>
             </nav>
 

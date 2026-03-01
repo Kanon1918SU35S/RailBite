@@ -56,8 +56,7 @@ const AdminOrderManagement = () => {
     const statusLabels = {
       confirmed: 'confirm',
       preparing: 'mark as preparing',
-      on_the_way: 'dispatch',
-      delivered: 'mark as delivered'
+      on_the_way: 'dispatch'
     };
 
     if (!window.confirm(`Are you sure you want to ${statusLabels[newStatus]} order #${order.orderNumber}?`)) return;
@@ -135,8 +134,8 @@ const AdminOrderManagement = () => {
       pending: { text: 'Pending', cls: 'status-pending' },
       confirmed: { text: 'Confirmed', cls: 'status-preparing' },
       preparing: { text: 'Preparing', cls: 'status-preparing' },
-      on_the_way: { text: 'On the Way', cls: 'status-sent' },
-      delivered: { text: 'Delivered', cls: 'status-delivered' },
+      on_the_way: { text: 'Dispatched', cls: 'status-sent' },
+      delivered: { text: 'Completed', cls: 'status-delivered' },
       cancelled: { text: 'Cancelled', cls: 'status-cancelled' }
     };
     return map[status] || map.pending;
@@ -248,10 +247,10 @@ const AdminOrderManagement = () => {
             Preparing ({orders.filter(o => o.status === 'preparing').length})
           </button>
           <button className={`filter-btn ${filter === 'on_the_way' ? 'active' : ''}`} onClick={() => setFilter('on_the_way')}>
-            On the Way ({orders.filter(o => o.status === 'on_the_way').length})
+            Dispatched ({orders.filter(o => o.status === 'on_the_way').length})
           </button>
           <button className={`filter-btn ${filter === 'delivered' ? 'active' : ''}`} onClick={() => setFilter('delivered')}>
-            Delivered ({orders.filter(o => o.status === 'delivered').length})
+            Completed ({orders.filter(o => o.status === 'delivered').length})
           </button>
           <button className={`filter-btn ${filter === 'cancelled' ? 'active' : ''}`} onClick={() => setFilter('cancelled')}>
             Cancelled ({orders.filter(o => o.status === 'cancelled').length})
@@ -354,10 +353,15 @@ const AdminOrderManagement = () => {
                               ✅ Confirm
                             </button>
                           )}
-                          {order.status === 'confirmed' && (
+                          {order.status === 'confirmed' && hasStaff && (
                             <button className="btn btn-primary btn-sm" onClick={() => handleStatusUpdate(order, 'preparing')}>
                               👨‍🍳 Preparing
                             </button>
+                          )}
+                          {order.status === 'confirmed' && !hasStaff && (
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-gray)', fontStyle: 'italic' }}>
+                              Assign staff first
+                            </span>
                           )}
                           {order.status === 'preparing' && hasStaff && (
                             <button className="btn btn-primary btn-sm" onClick={() => handleStatusUpdate(order, 'on_the_way')}>
@@ -365,9 +369,14 @@ const AdminOrderManagement = () => {
                             </button>
                           )}
                           {order.status === 'on_the_way' && (
-                            <button className="btn btn-primary btn-sm" onClick={() => handleStatusUpdate(order, 'delivered')}>
-                              🎉 Delivered
-                            </button>
+                            <span style={{ fontSize: '0.8rem', color: '#4ecdc4', fontStyle: 'italic' }}>
+                              ⏳ Waiting for delivery confirmation
+                            </span>
+                          )}
+                          {order.status === 'delivered' && (
+                            <span style={{ fontSize: '0.85rem', color: '#4caf50', fontWeight: 600 }}>
+                              ✅ Completed
+                            </span>
                           )}
                           {!['cancelled', 'delivered'].includes(order.status) && (
                             <button className="btn btn-danger btn-sm" onClick={() => handleCancelOrder(order)}>

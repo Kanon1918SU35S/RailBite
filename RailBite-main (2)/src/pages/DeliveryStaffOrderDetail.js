@@ -185,20 +185,22 @@ const DeliveryStaffOrderDetail = () => {
                 {/* Actions */}
                 <div className="ds-action-bar">
                     {(order.status === 'confirmed' || order.status === 'preparing') && (
-                        <button
-                            className="ds-btn ds-btn-pickup ds-btn-lg"
-                            onClick={() => handleUpdateStatus('picked_up')}
-                        >
-                            🏃 Pick Up Order
-                        </button>
+                        <div style={{ textAlign: 'center', color: 'var(--text-gray)', fontStyle: 'italic', padding: '1rem' }}>
+                            ⏳ Waiting for admin to dispatch this order
+                        </div>
                     )}
                     {order.status === 'on_the_way' && (
                         <button
                             className="ds-btn ds-btn-deliver ds-btn-lg"
                             onClick={() => handleUpdateStatus('delivered')}
                         >
-                            ✅ Mark Delivered
+                            ✅ Confirm Delivery
                         </button>
+                    )}
+                    {order.status === 'delivered' && (
+                        <div style={{ textAlign: 'center', color: '#4caf50', fontWeight: 600, padding: '1rem' }}>
+                            ✅ Delivery Completed
+                        </div>
                     )}
                 </div>
             </div>

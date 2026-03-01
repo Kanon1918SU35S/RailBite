@@ -12,7 +12,11 @@ export const authAPI = {
   forgotPassword: (email) =>
     axios.post(`${API_BASE_URL}/auth/forgot-password`, { email }),
   resetPassword: (token, newPassword) =>
-    axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword })
+    axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword }),
+  verifyEmail: (token) =>
+    axios.get(`${API_BASE_URL}/auth/verify-email/${token}`),
+  resendVerification: (email) =>
+    axios.post(`${API_BASE_URL}/auth/resend-verification`, { email })
 };
 
 
@@ -286,8 +290,10 @@ export const deliveryPortalAPI = {
 };
 
 export const contactAPI = {
-  send: (data) =>
-    axios.post(`${API_BASE_URL}/contact`, data),
+  send: (data, token) =>
+    axios.post(`${API_BASE_URL}/contact`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
 
   getAll: (token) =>
     axios.get(`${API_BASE_URL}/contact`, {

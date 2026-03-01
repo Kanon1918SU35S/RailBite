@@ -51,7 +51,7 @@ const DeliveryStaffActive = () => {
     const statusTimeline = [
         { id: 'confirmed', label: 'Order Confirmed', icon: '📋' },
         { id: 'preparing', label: 'Preparing', icon: '👨‍🍳' },
-        { id: 'on_the_way', label: 'On The Way', icon: '🚚' },
+        { id: 'on_the_way', label: 'Dispatched', icon: '🚚' },
         { id: 'delivered', label: 'Delivered', icon: '🎉' }
     ];
 
@@ -185,19 +185,16 @@ const DeliveryStaffActive = () => {
                         {/* Action Buttons */}
                         <div className="ds-action-bar">
                             {(activeOrder.status === 'confirmed' || activeOrder.status === 'preparing') && (
-                                <button
-                                    className="ds-btn ds-btn-pickup ds-btn-lg"
-                                    onClick={() => handleUpdateStatus('picked_up')}
-                                >
-                                    🏃 Pick Up Order
-                                </button>
+                                <div style={{ textAlign: 'center', color: 'var(--text-gray)', fontStyle: 'italic', padding: '1rem' }}>
+                                    ⏳ Waiting for admin to dispatch this order
+                                </div>
                             )}
                             {activeOrder.status === 'on_the_way' && (
                                 <button
                                     className="ds-btn ds-btn-deliver ds-btn-lg"
                                     onClick={() => handleUpdateStatus('delivered')}
                                 >
-                                    ✅ Mark Delivered
+                                    ✅ Confirm Delivery
                                 </button>
                             )}
                         </div>

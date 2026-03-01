@@ -2,32 +2,31 @@ import React, { useState } from 'react';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
 import { contactAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Contact = () => {
+  const { isAuthenticated } = useAuth();
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!message.trim()) {
+      setToast({ message: 'Please enter a message', type: 'error' });
+      return;
+    }
     setLoading(true);
 
     try {
-      const res = await contactAPI.send(formData);
+      const token = localStorage.getItem('railbiteToken');
+      const res = await contactAPI.send({ message }, token);
       if (res.data.success) {
         setToast({
           message: 'Thank you! We will contact you soon.',
           type: 'success'
         });
-        setFormData({ name: '', email: '', message: '' });
+        setMessage('');
       } else {
         setToast({
           message: res.data.message || 'Failed to send message',
@@ -97,53 +96,34 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Message form */}
-          <aside className="contact-form-panel">
-            <div className="contact-card contact-form-card">
-              <h2>Send us a message</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="contact-form-group">
-                  <label htmlFor="name">Full Name</label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="contact-form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="contact-form-group">
-                  <label htmlFor="message">Message</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <button
-                  className="btn btn-primary contact-submit"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? 'Sending...' : 'Submit'}
-                </button>
-              </form>
-            </div>
-          </aside>
+          {/* Message form - only visible when logged in */}
+          {isAuthenticated() && (
+            <aside className="contact-form-panel">
+              <div className="contact-card contact-form-card">
+                <h2>Send us a message</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="contact-form-group">
+                    <label htmlFor="message">Message</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Tell us how we can help you..."
+                      required
+                    />
+                  </div>
+                  <button
+                    className="btn btn-primary contact-submit"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? 'Sending...' : 'Submit'}
+                  </button>
+                </form>
+              </div>
+            </aside>
+          )}
         </section>
 
         {/* FAQ Section */}
