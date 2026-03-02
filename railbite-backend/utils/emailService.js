@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const net = require('net');
 
 // ─────────────────────────────────────────────────────────
 // Transport — supports Gmail App Password, custom SMTP, or
@@ -48,7 +49,21 @@ const createTransporter = async () => {
       greetingTimeout: 15000,
       socketTimeout: 20000,
       logger: process.env.NODE_ENV !== 'production',  // verbose SMTP log in dev
-      debug: process.env.NODE_ENV !== 'production'
+      debug: process.env.NODE_ENV !== 'production',
+      // Force IPv4 sockets to avoid ENETUNREACH (IPv6) on some cloud hosts
+      getSocket: (options, callback) => {
+        try {
+          const socket = net.connect({
+            host: options.host,
+            port: options.port,
+            family: 4,
+            timeout: 20000
+          }, () => callback(null, socket));
+          socket.on('error', (err) => callback(err));
+        } catch (err) {
+          callback(err);
+        }
+      }
     });
     console.log('[Email] Using Gmail SMTP:', process.env.GMAIL_USER);
   } else if (IS_PROD) {
