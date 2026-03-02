@@ -62,26 +62,58 @@ const createTransporter = async () => {
     });
     console.log('[Email] Using custom SMTP:', process.env.SMTP_HOST);
   } else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    // Gmail App Password — resolve to IPv4 to avoid ENETUNREACH on Render
+    // Gmail App Password — try SMTPS (465) first, then fallback to STARTTLS (587)
     const gmailIP = await resolveIPv4('smtp.gmail.com');
-    transporter = nodemailer.createTransport({
-      host: gmailIP,                   // IPv4 address instead of hostname
-      port: 465,
-      secure: true,                    // SSL on port 465
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
+
+    const attemptConfigs = [
+      {
+        // SMTPS explicit (IPv4 IP)
+        host: gmailIP,
+        port: 465,
+        secure: true,
+        tls: { servername: 'smtp.gmail.com', rejectUnauthorized: true, minVersion: 'TLSv1.2' }
       },
-      tls: {
-        servername: 'smtp.gmail.com',  // TLS SNI must match the real hostname
-        rejectUnauthorized: true,
-        minVersion: 'TLSv1.2'
-      },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000
-    });
-    console.log(`[Email] Using Gmail SMTP: ${process.env.GMAIL_USER} via ${gmailIP}:465`);
+      {
+        // STARTTLS (hostname) — sometimes allowed when 465 is blocked
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        tls: { servername: 'smtp.gmail.com', rejectUnauthorized: true, minVersion: 'TLSv1.2' }
+      }
+    ];
+
+    let lastError = null;
+    for (const cfg of attemptConfigs) {
+      try {
+        const conf = Object.assign({
+          auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 15000
+        }, cfg);
+
+        const candidate = nodemailer.createTransport(conf);
+        console.log(`[Email] Trying Gmail transport: ${conf.host}:${conf.port} secure=${conf.secure}`);
+
+        // Verify with timeout
+        await withTimeout(candidate.verify(), 12000, `SMTP verify ${conf.host}:${conf.port}`);
+
+        transporter = candidate;
+        console.log(`[Email] Gmail SMTP verified: ${conf.host}:${conf.port}`);
+        break; // success
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Email] Gmail transport failed for ${cfg.host}:${cfg.port} —`, err.message);
+        // try next config
+      }
+    }
+
+    if (!transporter) {
+      console.error('[Email] All Gmail transport attempts failed. Last error:', lastError && lastError.message);
+      // leave transporter null so caller sees an error from createTransporter
+      throw lastError || new Error('Gmail transport verification failed');
+    }
   } else if (IS_PROD) {
     // ──── PRODUCTION WITHOUT CREDENTIALS ────
     console.error(
