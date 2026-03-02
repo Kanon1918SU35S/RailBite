@@ -1,5 +1,35 @@
 const nodemailer = require('nodemailer');
-const net = require('net');
+const dns = require('dns');
+const { promisify } = require('util');
+
+const dnsLookup = promisify(dns.lookup);
+
+// ─────────────────────────────────────────────────────────
+// Helper: resolve hostname to IPv4 address
+// Render's free tier only has IPv4 outbound; Gmail DNS may
+// return an IPv6 AAAA record first → ENETUNREACH.
+// ─────────────────────────────────────────────────────────
+const resolveIPv4 = async (hostname) => {
+  try {
+    const { address } = await dnsLookup(hostname, { family: 4 });
+    console.log(`[Email] Resolved ${hostname} → ${address} (IPv4)`);
+    return address;
+  } catch (err) {
+    console.warn(`[Email] IPv4 DNS lookup failed for ${hostname}:`, err.message, '— using hostname directly');
+    return hostname;
+  }
+};
+
+// ─────────────────────────────────────────────────────────
+// Helper: wrap a promise with a timeout
+// ─────────────────────────────────────────────────────────
+const withTimeout = (promise, ms, label = 'Operation') =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+    )
+  ]);
 
 // ─────────────────────────────────────────────────────────
 // Transport — supports Gmail App Password, custom SMTP, or
@@ -32,9 +62,10 @@ const createTransporter = async () => {
     });
     console.log('[Email] Using custom SMTP:', process.env.SMTP_HOST);
   } else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    // Gmail App Password — use explicit SMTP config (more reliable on cloud platforms than `service: 'gmail'`)
+    // Gmail App Password — resolve to IPv4 to avoid ENETUNREACH on Render
+    const gmailIP = await resolveIPv4('smtp.gmail.com');
     transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: gmailIP,                   // IPv4 address instead of hostname
       port: 465,
       secure: true,                    // SSL on port 465
       auth: {
@@ -42,30 +73,15 @@ const createTransporter = async () => {
         pass: process.env.GMAIL_APP_PASSWORD
       },
       tls: {
+        servername: 'smtp.gmail.com',  // TLS SNI must match the real hostname
         rejectUnauthorized: true,
         minVersion: 'TLSv1.2'
       },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
-      logger: process.env.NODE_ENV !== 'production',  // verbose SMTP log in dev
-      debug: process.env.NODE_ENV !== 'production',
-      // Force IPv4 sockets to avoid ENETUNREACH (IPv6) on some cloud hosts
-      getSocket: (options, callback) => {
-        try {
-          const socket = net.connect({
-            host: options.host,
-            port: options.port,
-            family: 4,
-            timeout: 20000
-          }, () => callback(null, socket));
-          socket.on('error', (err) => callback(err));
-        } catch (err) {
-          callback(err);
-        }
-      }
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000
     });
-    console.log('[Email] Using Gmail SMTP:', process.env.GMAIL_USER);
+    console.log(`[Email] Using Gmail SMTP: ${process.env.GMAIL_USER} via ${gmailIP}:465`);
   } else if (IS_PROD) {
     // ──── PRODUCTION WITHOUT CREDENTIALS ────
     console.error(
@@ -110,9 +126,9 @@ const createTransporter = async () => {
     }
   }
 
-  // Verify the SMTP connection works before caching
+  // Verify the SMTP connection works before caching (with timeout so it never hangs)
   try {
-    await transporter.verify();
+    await withTimeout(transporter.verify(), 12000, 'SMTP verify');
     transporterVerified = true;
     console.log('[Email] SMTP connection verified successfully ✓');
   } catch (err) {
@@ -191,16 +207,20 @@ const btnStyle =
 // ─────────────────────────────────────────────────
 const sendEmail = async ({ to, subject, html, text }) => {
   try {
-    const t = await createTransporter();
+    const t = await withTimeout(createTransporter(), 15000, 'Create transporter');
     console.log(`[Email] Sending "${subject}" to ${to}...`);
 
-    const info = await t.sendMail({
-      from: FROM,
-      to,
-      subject,
-      html,
-      text: text || subject
-    });
+    const info = await withTimeout(
+      t.sendMail({
+        from: FROM,
+        to,
+        subject,
+        html,
+        text: text || subject
+      }),
+      20000,
+      'sendMail'
+    );
 
     // Log Ethereal preview URL in dev
     if (info.messageId && !process.env.SMTP_HOST && !process.env.GMAIL_USER) {
@@ -495,9 +515,9 @@ const testEmailConfig = async () => {
   };
 
   try {
-    const t = await createTransporter();
+    const t = await withTimeout(createTransporter(), 15000, 'Create transporter');
     if (t.verify) {
-      await t.verify();
+      await withTimeout(t.verify(), 12000, 'SMTP verify');
       config.smtpConnection = 'OK';
     } else {
       config.smtpConnection = 'stub (no real transport)';

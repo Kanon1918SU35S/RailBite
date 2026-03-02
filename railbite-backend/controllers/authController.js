@@ -412,27 +412,44 @@ exports.resendVerification = async (req, res) => {
 
 // GET/POST /api/auth/test-email — diagnostic endpoint to verify email config
 exports.testEmail = async (req, res) => {
+  // Hard 25s safety timeout — always respond, never hang
+  const timer = setTimeout(() => {
+    if (!res.headersSent) {
+      res.status(504).json({
+        success: false,
+        message: 'Email diagnostic timed out after 25 seconds. SMTP connection likely blocked.',
+        tip: 'Check Render logs for [Email] messages. Your host may block outbound SMTP.'
+      });
+    }
+  }, 25000);
+
   try {
     // Step 1: Check config
     const config = await testEmailConfig();
 
     // Step 2: Optionally send a real test email
-    const { email } = req.query || req.body || {};
+    const email = (req.query && req.query.email) || (req.body && req.body.email);
     let sendResult = null;
 
     if (email) {
       sendResult = await sendTestEmail(email);
     }
 
-    res.json({
-      success: true,
-      config,
-      sendResult,
-      tip: !email
-        ? 'Add ?email=you@example.com to send a real test email'
-        : undefined
-    });
+    clearTimeout(timer);
+    if (!res.headersSent) {
+      res.json({
+        success: true,
+        config,
+        sendResult,
+        tip: !email
+          ? 'Add ?email=you@example.com to send a real test email'
+          : undefined
+      });
+    }
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message, stack: error.stack });
+    clearTimeout(timer);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: error.message });
+    }
   }
 };
