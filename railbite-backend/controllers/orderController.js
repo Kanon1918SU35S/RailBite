@@ -64,7 +64,9 @@ exports.createOrder = async (req, res) => {
       deliveryFee,
       total,
       couponCode,
-      couponDiscount
+      couponDiscount,
+      loyaltyPointsUsed,
+      loyaltyDiscount
     } = req.body;
 
     if (!items || items.length === 0) {
@@ -91,6 +93,8 @@ exports.createOrder = async (req, res) => {
       dueAmount: dueAmount || 0,
       couponCode: couponCode || '',
       couponDiscount: couponDiscount || 0,
+      loyaltyPointsUsed: loyaltyPointsUsed || 0,
+      loyaltyDiscount: loyaltyDiscount || 0,
       subtotal,
       vat: vat || 0,
       deliveryFee: deliveryFee || 50,

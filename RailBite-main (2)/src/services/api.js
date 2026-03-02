@@ -12,11 +12,7 @@ export const authAPI = {
   forgotPassword: (email) =>
     axios.post(`${API_BASE_URL}/auth/forgot-password`, { email }),
   resetPassword: (token, newPassword) =>
-    axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword }),
-  verifyEmail: (token) =>
-    axios.get(`${API_BASE_URL}/auth/verify-email/${token}`),
-  resendVerification: (email) =>
-    axios.post(`${API_BASE_URL}/auth/resend-verification`, { email })
+    axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword })
 };
 
 

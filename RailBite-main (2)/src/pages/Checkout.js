@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
 import { useMenu } from '../context/MenuContext';
-import { couponAPI, paymentAPI } from '../services/api';
+import { couponAPI, paymentAPI, loyaltyAPI } from '../services/api';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
 
@@ -57,6 +57,13 @@ const Checkout = () => {
   const [couponApplied, setCouponApplied] = useState(null);
   const [couponLoading, setCouponLoading] = useState(false);
 
+  // Loyalty points state
+  const [loyaltyData, setLoyaltyData] = useState(null);
+  const [loyaltyPointsToUse, setLoyaltyPointsToUse] = useState(0);
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [loyaltyApplied, setLoyaltyApplied] = useState(false);
+  const [loyaltyLoading, setLoyaltyLoading] = useState(false);
+
   // Image lookup for items without stored images
   const imageMap = useMemo(() => {
     const map = {};
@@ -68,6 +75,23 @@ const Checkout = () => {
     if (cart.length === 0) navigate('/cart');
   }, [cart, navigate]);
 
+  // Fetch loyalty points on mount
+  useEffect(() => {
+    const fetchLoyalty = async () => {
+      const token = localStorage.getItem('railbiteToken');
+      if (!token) return;
+      try {
+        const res = await loyaltyAPI.getMyPoints(token);
+        if (res.data.success) {
+          setLoyaltyData(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch loyalty points:', err);
+      }
+    };
+    fetchLoyalty();
+  }, []);
+
   const showToast = (message, type) => setToast({ show: true, message, type });
   const hideToast = () => setToast({ show: false, message: '', type: '' });
 
@@ -75,7 +99,7 @@ const Checkout = () => {
   const subtotal = useMemo(() => cart.reduce((t, i) => t + i.price * i.quantity, 0), [cart]);
   const vat = useMemo(() => Math.round(subtotal * 0.05), [subtotal]);
   const deliveryFee = 50;
-  const total = subtotal + vat + deliveryFee - couponDiscount;
+  const total = subtotal + vat + deliveryFee - couponDiscount - loyaltyDiscount;
   const totalItems = useMemo(() => cart.reduce((t, i) => t + i.quantity, 0), [cart]);
   const advanceAmount = Math.ceil(total * 0.5);
   const dueAmount = total - advanceAmount;
@@ -115,6 +139,39 @@ const Checkout = () => {
     setCouponDiscount(0);
     setCouponApplied(null);
     showToast('Coupon removed', 'info');
+  };
+
+  /* ─── Loyalty Points handlers ─── */
+  const handleApplyLoyalty = () => {
+    if (!loyaltyData || loyaltyData.points < 50) {
+      showToast('Minimum 50 points required to redeem', 'error');
+      return;
+    }
+    const pts = parseInt(loyaltyPointsToUse);
+    if (!pts || pts < 50) {
+      showToast('Enter at least 50 points to redeem', 'error');
+      return;
+    }
+    if (pts > loyaltyData.points) {
+      showToast(`You only have ${loyaltyData.points} points available`, 'error');
+      return;
+    }
+    const discount = pts * 0.5;
+    const maxDiscount = subtotal + vat + deliveryFee - couponDiscount;
+    const finalDiscount = Math.min(discount, maxDiscount);
+    const finalPoints = Math.ceil(finalDiscount / 0.5);
+
+    setLoyaltyDiscount(finalDiscount);
+    setLoyaltyPointsToUse(finalPoints);
+    setLoyaltyApplied(true);
+    showToast(`${finalPoints} loyalty points applied! You save ৳${finalDiscount.toFixed(0)}`, 'success');
+  };
+
+  const handleRemoveLoyalty = () => {
+    setLoyaltyPointsToUse(0);
+    setLoyaltyDiscount(0);
+    setLoyaltyApplied(false);
+    showToast('Loyalty points removed', 'info');
   };
 
   /* ─── Detect card type ─── */
@@ -267,6 +324,8 @@ const Checkout = () => {
       dueAmount: orderDue,
       couponCode: couponApplied ? couponApplied.code : '',
       couponDiscount: couponDiscount || 0,
+      loyaltyPointsUsed: loyaltyApplied ? loyaltyPointsToUse : 0,
+      loyaltyDiscount: loyaltyApplied ? loyaltyDiscount : 0,
       subtotal,
       vat,
       deliveryFee,
@@ -290,6 +349,18 @@ const Checkout = () => {
             );
           } catch (e) {
             console.error('Coupon apply tracking failed:', e.message);
+          }
+        }
+
+        // Redeem loyalty points on backend
+        if (loyaltyApplied && loyaltyPointsToUse >= 50) {
+          try {
+            await loyaltyAPI.redeem(
+              { orderId: order._id, points: loyaltyPointsToUse },
+              token
+            );
+          } catch (e) {
+            console.error('Loyalty redeem failed:', e.message);
           }
         }
 
@@ -745,6 +816,119 @@ const Checkout = () => {
               )}
             </div>
 
+            {/* ── LOYALTY POINTS SECTION ── */}
+            {loyaltyData && loyaltyData.points >= 50 && (
+              <div style={{
+                padding: '1rem',
+                background: 'rgba(255,215,0,0.06)',
+                borderRadius: '10px',
+                marginBottom: '0.5rem',
+                border: '1px solid rgba(255,215,0,0.15)'
+              }}>
+                <h4 style={{ color: '#ffd700', marginBottom: '0.8rem', fontSize: '0.95rem' }}>
+                  🎖️ Loyalty Points ({loyaltyData.points} pts = ৳{(loyaltyData.points * 0.5).toFixed(0)})
+                </h4>
+                {loyaltyApplied ? (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'rgba(255,215,0,0.12)',
+                    border: '1px solid rgba(255,215,0,0.3)',
+                    borderRadius: '8px',
+                    padding: '0.8rem 1rem'
+                  }}>
+                    <div>
+                      <span style={{ color: '#ffd700', fontWeight: '700', fontSize: '0.95rem' }}>
+                        ✅ {loyaltyPointsToUse} points applied
+                      </span>
+                      <p style={{ color: '#b0b0b0', fontSize: '0.8rem', margin: '0.2rem 0 0' }}>
+                        Saving ৳{loyaltyDiscount.toFixed(0)} on this order
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveLoyalty}
+                      style={{
+                        background: 'rgba(255,107,107,0.2)',
+                        border: '1px solid rgba(255,107,107,0.4)',
+                        color: '#ff6b6b',
+                        borderRadius: '6px',
+                        padding: '0.4rem 0.8rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <p style={{ color: '#9ca3af', fontSize: '0.82rem', marginBottom: '0.6rem' }}>
+                      Min. 50 points · 1 point = ৳0.50 discount
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        placeholder="Points to use"
+                        min="50"
+                        max={loyaltyData.points}
+                        value={loyaltyPointsToUse || ''}
+                        onChange={(e) => setLoyaltyPointsToUse(Math.min(parseInt(e.target.value) || 0, loyaltyData.points))}
+                        style={{
+                          flex: 1,
+                          padding: '0.7rem 1rem',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255,215,0,0.25)',
+                          background: 'rgba(255,255,255,0.08)',
+                          color: '#fff',
+                          fontSize: '0.9rem'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setLoyaltyPointsToUse(loyaltyData.points)}
+                        style={{
+                          padding: '0.7rem 0.8rem',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255,215,0,0.3)',
+                          background: 'rgba(255,215,0,0.1)',
+                          color: '#ffd700',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        Use All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleApplyLoyalty}
+                        style={{
+                          padding: '0.7rem 1.2rem',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #ffd700, #daa520)',
+                          color: '#1a1a2e',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {loyaltyPointsToUse >= 50 && (
+                      <p style={{ color: '#ffd700', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                        = ৳{(loyaltyPointsToUse * 0.5).toFixed(0)} discount
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="checkout-calc-rows">
               <div className="checkout-calc-row">
                 <span>Subtotal</span>
@@ -762,6 +946,12 @@ const Checkout = () => {
                 <div className="checkout-calc-row" style={{ color: '#28a745' }}>
                   <span>🎟️ Coupon Discount</span>
                   <span>-৳{couponDiscount.toFixed(2)}</span>
+                </div>
+              )}
+              {loyaltyDiscount > 0 && (
+                <div className="checkout-calc-row" style={{ color: '#ffd700' }}>
+                  <span>🎖️ Loyalty Discount</span>
+                  <span>-৳{loyaltyDiscount.toFixed(2)}</span>
                 </div>
               )}
             </div>

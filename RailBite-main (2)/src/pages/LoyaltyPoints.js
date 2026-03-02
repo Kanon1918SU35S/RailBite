@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { loyaltyAPI } from '../services/api';
 import BackButton from '../components/BackButton';
@@ -26,6 +27,7 @@ const tierIcons = {
 
 export default function LoyaltyPoints() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -139,6 +141,44 @@ export default function LoyaltyPoints() {
                     ))}
                 </div>
             </div>
+
+            {/* Redeem CTA */}
+            {(data?.points || 0) >= 50 && (
+                <div className="loyalty-info-card" style={{ 
+                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(218,165,32,0.08))',
+                    border: '1px solid rgba(255,215,0,0.25)',
+                    textAlign: 'center',
+                    padding: '1.5rem'
+                }}>
+                    <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '0.5rem' }}>💰</span>
+                    <h3 className="loyalty-section-title" style={{ color: '#ffd700' }}>
+                        Ready to Redeem?
+                    </h3>
+                    <p style={{ color: '#b0b0b0', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                        You have <strong style={{ color: '#ffd700' }}>{data.points} points</strong> worth{' '}
+                        <strong style={{ color: '#ffd700' }}>৳{(data.points * 0.5).toFixed(0)}</strong>.
+                        Use them at checkout to get a discount on your next order!
+                    </p>
+                    <button
+                        onClick={() => navigate('/menu-categories')}
+                        style={{
+                            padding: '0.8rem 2rem',
+                            borderRadius: '10px',
+                            border: 'none',
+                            background: 'linear-gradient(135deg, #ffd700, #daa520)',
+                            color: '#1a1a2e',
+                            fontWeight: '700',
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        🛒 Order Now & Redeem
+                    </button>
+                </div>
+            )}
 
             {/* Tabs */}
             <div className="loyalty-tabs">

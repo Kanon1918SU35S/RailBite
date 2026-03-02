@@ -52,17 +52,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: response.data.message || 'Login failed' };
       }
     } catch (error) {
-      const data = error.response?.data;
-      // Handle unverified email
-      if (data?.needsVerification) {
-        return {
-          success: false,
-          message: data.message,
-          needsVerification: true,
-          email: data.email
-        };
-      }
-      const message = data?.message || 'Login failed';
+      const message = error.response?.data?.message || 'Login failed';
       return { success: false, message };
     }
   };
@@ -79,15 +69,6 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.register(payload);
 
       if (response.data.success) {
-        // If needs verification, don't auto-login
-        if (response.data.needsVerification) {
-          return {
-            success: true,
-            needsVerification: true,
-            email: response.data.email,
-            message: response.data.message
-          };
-        }
         const { token, user } = response.data;
         localStorage.setItem('railbiteToken', token);
         localStorage.setItem('railbiteUser', JSON.stringify(user));

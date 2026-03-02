@@ -19,22 +19,17 @@ services:
         sync: false
       - key: SSLCOMMERZ_SANDBOX
         value: "true"
-      # ── Email (pick ONE option) ──
-      # Option 1: Gmail App Password (easiest)
-      - key: GMAIL_USER
-        sync: false  # e.g. yourname@gmail.com
-      - key: GMAIL_APP_PASSWORD
-        sync: false  # 16-char app password from Google
-      # Option 2: Custom SMTP (SendGrid, Mailgun, etc.)
-      # - key: SMTP_HOST
+      # ── Email Provider (Brevo recommended — SMTP is blocked on Render) ──
+      # Option 1: Brevo HTTP API (FREE 300 emails/day, works on Render)
+      - key: BREVO_API_KEY
+        sync: false  # Get from https://app.brevo.com/settings/keys/api
+      - key: BREVO_SENDER_EMAIL
+        sync: false  # Your verified sender email in Brevo
+      # Option 2: Resend HTTP API (FREE 100 emails/day)
+      # - key: RESEND_API_KEY
       #   sync: false
-      # - key: SMTP_PORT
-      #   value: "587"
-      # - key: SMTP_SECURE
-      #   value: "false"
-      # - key: SMTP_USER
+      # Option 3: Gmail SMTP (⚠️ BLOCKED on Render free tier)
+      # - key: GMAIL_USER
       #   sync: false
-      # - key: SMTP_PASS
+      # - key: GMAIL_APP_PASSWORD
       #   sync: false
-      - key: EMAIL_FROM
-        value: '"RailBite Bangladesh" <noreply@railbitebd.com>'

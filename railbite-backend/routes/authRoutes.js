@@ -6,10 +6,7 @@ const {
   getMe,
   seedAdmin,
   forgotPassword,
-  resetPassword,
-  verifyEmail,
-  resendVerification,
-  testEmail
+  resetPassword
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
@@ -19,9 +16,5 @@ router.get('/me', protect, getMe);
 router.post('/seed-admin', seedAdmin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
-router.get('/verify-email/:token', verifyEmail);
-router.post('/resend-verification', resendVerification);
-router.get('/test-email', testEmail);
-router.post('/test-email', testEmail);
 
 module.exports = router;
