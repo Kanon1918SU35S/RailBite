@@ -2,12 +2,17 @@ const nodemailer = require('nodemailer');
 
 // ─────────────────────────────────────────────────────────
 // Transport — supports Gmail App Password, custom SMTP, or
-// falls back to Ethereal (test) when no env vars are set.
+// falls back to Ethereal (test) in development only.
+// In production, emails are SKIPPED if no provider is set.
 // ─────────────────────────────────────────────────────────
 let transporter;
+let transporterVerified = false;
+
+const IS_PROD = process.env.NODE_ENV === 'production';
 
 const createTransporter = async () => {
-  if (transporter) return transporter;
+  // Return cached transporter only if it was verified successfully
+  if (transporter && transporterVerified) return transporter;
 
   if (process.env.SMTP_HOST) {
     // Custom SMTP (SendGrid, Mailgun, your own server, etc.)
@@ -18,8 +23,13 @@ const createTransporter = async () => {
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-      }
+      },
+      // Render / cloud timeouts
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000
     });
+    console.log('[Email] Using custom SMTP:', process.env.SMTP_HOST);
   } else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
     // Gmail App Password shortcut
     transporter = nodemailer.createTransport({
@@ -27,10 +37,30 @@ const createTransporter = async () => {
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD
-      }
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000
     });
+    console.log('[Email] Using Gmail:', process.env.GMAIL_USER);
+  } else if (IS_PROD) {
+    // ──── PRODUCTION WITHOUT CREDENTIALS ────
+    console.error(
+      '\n╔══════════════════════════════════════════════════════════╗\n' +
+      '║  [Email] ERROR: No email provider configured!           ║\n' +
+      '║  Set GMAIL_USER + GMAIL_APP_PASSWORD or SMTP_* env vars ║\n' +
+      '║  in your Render dashboard. Emails will NOT be sent.     ║\n' +
+      '╚══════════════════════════════════════════════════════════╝\n'
+    );
+    // Stub transport so the app doesn't crash — but emails won't reach users
+    transporter = {
+      sendMail: async () => ({ messageId: 'stub-no-provider-in-production' }),
+      verify: async () => true
+    };
+    transporterVerified = true;
+    return transporter;
   } else {
-    // Fallback — Ethereal test account (emails viewable at ethereal.email)
+    // Fallback — Ethereal test account (dev only, viewable at ethereal.email)
     try {
       const testAccount = await Promise.race([
         nodemailer.createTestAccount(),
@@ -48,9 +78,28 @@ const createTransporter = async () => {
       console.log('[Email] Using Ethereal test account:', testAccount.user);
     } catch (err) {
       console.warn('[Email] Ethereal fallback failed:', err.message, '— emails will be skipped');
-      // Create a stub transport that silently discards emails
-      transporter = { sendMail: async () => ({ messageId: 'stub-no-transport' }) };
+      transporter = {
+        sendMail: async () => ({ messageId: 'stub-no-transport' }),
+        verify: async () => true
+      };
+      transporterVerified = true;
+      return transporter;
     }
+  }
+
+  // Verify the SMTP connection works before caching
+  try {
+    await transporter.verify();
+    transporterVerified = true;
+    console.log('[Email] SMTP connection verified successfully ✓');
+  } catch (err) {
+    console.error('[Email] SMTP connection verification FAILED:', err.message);
+    console.error('[Email] Check your SMTP/Gmail credentials in environment variables.');
+    // Don't cache a broken transporter — allow retry on next call
+    const failedTransporter = transporter;
+    transporter = null;
+    transporterVerified = false;
+    return failedTransporter; // Still return it so the caller gets an error from sendMail
   }
 
   return transporter;
@@ -116,6 +165,8 @@ const btnStyle =
 const sendEmail = async ({ to, subject, html, text }) => {
   try {
     const t = await createTransporter();
+    console.log(`[Email] Sending "${subject}" to ${to}...`);
+
     const info = await t.sendMail({
       from: FROM,
       to,
@@ -126,15 +177,20 @@ const sendEmail = async ({ to, subject, html, text }) => {
 
     // Log Ethereal preview URL in dev
     if (info.messageId && !process.env.SMTP_HOST && !process.env.GMAIL_USER) {
-      console.log(
-        '[Email] Preview URL:',
-        nodemailer.getTestMessageUrl(info)
-      );
+      const previewUrl = nodemailer.getTestMessageUrl
+        ? nodemailer.getTestMessageUrl(info)
+        : null;
+      if (previewUrl) {
+        console.log('[Email] Preview URL:', previewUrl);
+      }
     }
 
+    console.log(`[Email] Sent successfully: ${info.messageId}`);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('[Email] Send failed:', error.message);
+    console.error(`[Email] Send failed to ${to}:`, error.message);
+    if (error.code) console.error('[Email] Error code:', error.code);
+    if (error.responseCode) console.error('[Email] SMTP response code:', error.responseCode);
     return { success: false, error: error.message };
   }
 };
