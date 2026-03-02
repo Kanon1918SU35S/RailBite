@@ -31,18 +31,26 @@ const createTransporter = async () => {
     });
     console.log('[Email] Using custom SMTP:', process.env.SMTP_HOST);
   } else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    // Gmail App Password shortcut
+    // Gmail App Password — use explicit SMTP config (more reliable on cloud platforms than `service: 'gmail'`)
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,                    // SSL on port 465
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000
+      tls: {
+        rejectUnauthorized: true,
+        minVersion: 'TLSv1.2'
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+      logger: process.env.NODE_ENV !== 'production',  // verbose SMTP log in dev
+      debug: process.env.NODE_ENV !== 'production'
     });
-    console.log('[Email] Using Gmail:', process.env.GMAIL_USER);
+    console.log('[Email] Using Gmail SMTP:', process.env.GMAIL_USER);
   } else if (IS_PROD) {
     // ──── PRODUCTION WITHOUT CREDENTIALS ────
     console.error(
@@ -108,8 +116,12 @@ const createTransporter = async () => {
 // ─────────────────────────────────────────────────
 // Helper — sender address
 // ─────────────────────────────────────────────────
-const FROM =
-  process.env.EMAIL_FROM || '"RailBite Bangladesh" <noreply@railbitebd.com>';
+// Gmail ignores custom FROM addresses and sends from the authenticated account.
+// We must use the actual Gmail address as sender, or Gmail silently rewrites it.
+const FROM = process.env.EMAIL_FROM
+  || (process.env.GMAIL_USER
+      ? `"RailBite Bangladesh" <${process.env.GMAIL_USER}>`
+      : '"RailBite Bangladesh" <noreply@railbitebd.com>');
 
 const FRONTEND_URL =
   process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -452,6 +464,53 @@ const sendPaymentConfirmationEmail = async (user, order, payment) => {
   });
 };
 
+/**
+ * Diagnostic — test email config from /api/auth/test-email
+ */
+const testEmailConfig = async () => {
+  const config = {
+    provider: process.env.SMTP_HOST
+      ? `SMTP (${process.env.SMTP_HOST})`
+      : process.env.GMAIL_USER
+        ? `Gmail (${process.env.GMAIL_USER})`
+        : 'None (Ethereal/stub)',
+    from: FROM,
+    frontendUrl: FRONTEND_URL,
+    nodeEnv: process.env.NODE_ENV || 'not set'
+  };
+
+  try {
+    const t = await createTransporter();
+    if (t.verify) {
+      await t.verify();
+      config.smtpConnection = 'OK';
+    } else {
+      config.smtpConnection = 'stub (no real transport)';
+    }
+  } catch (err) {
+    config.smtpConnection = `FAILED: ${err.message}`;
+  }
+
+  return config;
+};
+
+/**
+ * Send a real test email to verify delivery works end-to-end
+ */
+const sendTestEmail = async (toEmail) => {
+  const html = wrapHTML(`
+    <h2 style="color:#fff;margin-top:0;">Test Email from RailBite ✅</h2>
+    <p style="color:#ccc;line-height:1.7;">If you can read this, email delivery is working correctly!</p>
+    <p style="color:#999;font-size:13px;">Sent at: ${new Date().toISOString()}</p>
+  `);
+
+  return sendEmail({
+    to: toEmail,
+    subject: 'RailBite Email Test',
+    html
+  });
+};
+
 module.exports = {
   sendEmail,
   sendVerificationEmail,
@@ -461,5 +520,7 @@ module.exports = {
   sendOrderConfirmationEmail,
   sendOrderStatusEmail,
   sendContactConfirmationEmail,
-  sendPaymentConfirmationEmail
+  sendPaymentConfirmationEmail,
+  testEmailConfig,
+  sendTestEmail
 };

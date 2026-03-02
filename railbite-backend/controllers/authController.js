@@ -5,7 +5,9 @@ const {
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendPasswordChangedEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  testEmailConfig,
+  sendTestEmail
 } = require('../utils/emailService');
 
 exports.login = async (req, res) => {
@@ -121,12 +123,18 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Send verification email for customers (non-blocking)
+    // Send verification email for customers
     if (userRole === 'customer') {
-      // Fire-and-forget — don't block the HTTP response
-      sendVerificationEmail(user, verificationToken).catch(err =>
-        console.error('[Register] Failed to send verification email:', err.message)
-      );
+      try {
+        const emailResult = await sendVerificationEmail(user, verificationToken);
+        if (!emailResult.success) {
+          console.error('[Register] Verification email failed:', emailResult.error);
+        } else {
+          console.log('[Register] Verification email sent to:', user.email, 'msgId:', emailResult.messageId);
+        }
+      } catch (err) {
+        console.error('[Register] Verification email exception:', err.message);
+      }
       return res.status(201).json({
         success: true,
         message: 'Registration successful! Please check your email to verify your account.',
@@ -383,10 +391,15 @@ exports.resendVerification = async (req, res) => {
     user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24h
     await user.save();
 
-    // Send verification email (non-blocking)
-    sendVerificationEmail(user, verificationToken).catch(err =>
-      console.error('[ResendVerification] Email error:', err.message)
-    );
+    // Send verification email (await for better error visibility)
+    try {
+      const emailResult = await sendVerificationEmail(user, verificationToken);
+      if (!emailResult.success) {
+        console.error('[ResendVerification] Email failed:', emailResult.error);
+      }
+    } catch (err) {
+      console.error('[ResendVerification] Email error:', err.message);
+    }
 
     res.json({
       success: true,
@@ -394,5 +407,32 @@ exports.resendVerification = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// GET/POST /api/auth/test-email — diagnostic endpoint to verify email config
+exports.testEmail = async (req, res) => {
+  try {
+    // Step 1: Check config
+    const config = await testEmailConfig();
+
+    // Step 2: Optionally send a real test email
+    const { email } = req.query || req.body || {};
+    let sendResult = null;
+
+    if (email) {
+      sendResult = await sendTestEmail(email);
+    }
+
+    res.json({
+      success: true,
+      config,
+      sendResult,
+      tip: !email
+        ? 'Add ?email=you@example.com to send a real test email'
+        : undefined
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message, stack: error.stack });
   }
 };
