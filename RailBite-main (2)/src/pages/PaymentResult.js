@@ -50,9 +50,9 @@ const PaymentResult = () => {
 
                 <p style={{ color: '#b0b0b0', marginBottom: '2rem', fontSize: '0.95rem' }}>
                     {isSuccess
-                        ? `Your payment for order ${orderNumber || ''} has been processed successfully.`
+                        ? `Your ${providerLabel ? providerLabel + ' ' : ''}payment for order ${orderNumber || ''} has been processed successfully.`
                         : isCancelled
-                            ? 'You cancelled the payment. Your order is still saved — you can pay later.'
+                            ? `You cancelled the ${providerLabel ? providerLabel + ' ' : ''}payment. Your order is still saved — you can pay later.`
                             : message || 'Something went wrong with your payment. Please try again.'}
                 </p>
 

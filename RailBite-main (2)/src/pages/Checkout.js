@@ -592,49 +592,91 @@ const Checkout = () => {
                       <div className="mb-step-header">
                         <h5>Payment Instructions for {selectedProvider.name}</h5>
                       </div>
-                      <div className="mb-steps">
-                        <div className="mb-step">
-                          <span className="mb-step-num">1</span>
-                          <span>Open your <strong>{selectedProvider.name}</strong> app</span>
-                        </div>
-                        <div className="mb-step">
-                          <span className="mb-step-num">2</span>
-                          <span>Select <strong>"Send Money"</strong> or <strong>"Payment"</strong></span>
-                        </div>
-                        <div className="mb-step">
-                          <span className="mb-step-num">3</span>
-                          <span>Send <strong>৳{total.toFixed(2)}</strong> to: <code className="mb-number">{selectedProvider.number}</code></span>
-                        </div>
-                        <div className="mb-step">
-                          <span className="mb-step-num">4</span>
-                          <span>Enter the <strong>Transaction ID</strong> and your <strong>account number</strong> below</span>
-                        </div>
-                      </div>
 
-                      <div className="form-group">
-                        <label>Your {selectedProvider.name} Number <span style={{ color: '#ff6b6b' }}>*</span></label>
-                        <input
-                          type="tel"
-                          name="accountNumber"
-                          placeholder="01XXXXXXXXX"
-                          value={mobileBankingInfo.accountNumber}
-                          onChange={handleMobileBankingChange}
-                          maxLength="11"
-                          required
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>Transaction ID <span style={{ color: '#ff6b6b' }}>*</span></label>
-                        <input
-                          type="text"
-                          name="transactionId"
-                          placeholder="e.g. TXN8A7B3C2D1E"
-                          value={mobileBankingInfo.transactionId}
-                          onChange={handleMobileBankingChange}
-                          required
-                        />
-                        <small style={{ color: '#b0b0b0' }}>Enter the Transaction ID from your {selectedProvider.name} confirmation SMS</small>
-                      </div>
+                      {/* ── bKash / Nagad: API-flow (redirect) ── */}
+                      {selectedProvider.apiFlow ? (
+                        <>
+                          <div className="mb-steps">
+                            <div className="mb-step">
+                              <span className="mb-step-num">1</span>
+                              <span>Click <strong>"Place Order"</strong> below</span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">2</span>
+                              <span>You'll be redirected to <strong>{selectedProvider.name}</strong> secure checkout</span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">3</span>
+                              <span>Complete payment of <strong>৳{total.toFixed(2)}</strong> on {selectedProvider.name}</span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">4</span>
+                              <span>You'll be redirected back to RailBite automatically</span>
+                            </div>
+                          </div>
+                          <div style={{
+                            background: `rgba(${selectedProvider.id === 'bkash' ? '226,19,110' : '246,146,30'},0.1)`,
+                            border: `1px solid ${selectedProvider.color}44`,
+                            borderRadius: '10px',
+                            padding: '1rem',
+                            marginTop: '1rem',
+                            textAlign: 'center'
+                          }}>
+                            <span style={{ fontSize: '2rem' }}>{selectedProvider.icon}</span>
+                            <p style={{ color: selectedProvider.color, margin: '0.5rem 0 0', fontWeight: 600 }}>
+                              Pay ৳{total.toFixed(2)} via {selectedProvider.name}
+                            </p>
+                            <small style={{ color: '#b0b0b0' }}>Merchant: <code className="mb-number">01720216708</code></small>
+                          </div>
+                        </>
+                      ) : (
+                        /* ── Rocket / Upay: Manual send-money ── */
+                        <>
+                          <div className="mb-steps">
+                            <div className="mb-step">
+                              <span className="mb-step-num">1</span>
+                              <span>Open your <strong>{selectedProvider.name}</strong> app</span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">2</span>
+                              <span>Select <strong>"Send Money"</strong></span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">3</span>
+                              <span>Send <strong>৳{total.toFixed(2)}</strong> to: <code className="mb-number">{selectedProvider.number}</code></span>
+                            </div>
+                            <div className="mb-step">
+                              <span className="mb-step-num">4</span>
+                              <span>Enter the <strong>Transaction ID</strong> and your <strong>account number</strong> below</span>
+                            </div>
+                          </div>
+
+                          <div className="form-group">
+                            <label>Your {selectedProvider.name} Number <span style={{ color: '#ff6b6b' }}>*</span></label>
+                            <input
+                              type="tel"
+                              name="accountNumber"
+                              placeholder="01XXXXXXXXX"
+                              value={mobileBankingInfo.accountNumber}
+                              onChange={handleMobileBankingChange}
+                              maxLength="11"
+                              required
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label>Transaction ID <span style={{ color: '#ff6b6b' }}>*</span></label>
+                            <input
+                              type="text"
+                              name="transactionId"
+                              placeholder="e.g. TXN8A7B3C2D1E"
+                              value={mobileBankingInfo.transactionId}
+                              onChange={handleMobileBankingChange}
+                              required
+                            />
+                            <small style={{ color: '#b0b0b0' }}>Enter the Transaction ID from your {selectedProvider.name} confirmation SMS</small>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
