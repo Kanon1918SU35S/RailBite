@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DeliveryStaffSidebar from '../components/DeliveryStaffSidebar';
 import { useDeliveryStaff } from '../context/DeliveryStaffContext';
 import { deliveryPortalAPI } from '../services/api';
+import Toast from '../components/Toast';
 
 const DeliveryStaffActive = () => {
     const { getToken } = useDeliveryStaff();
@@ -9,6 +10,7 @@ const DeliveryStaffActive = () => {
     const [activeOrder, setActiveOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [toast, setToast] = useState(null);
 
     useEffect(() => {
         fetchActiveDelivery();
@@ -44,7 +46,7 @@ const DeliveryStaffActive = () => {
                 fetchActiveDelivery();
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to update status');
+            setToast({ message: err.response?.data?.message || 'Failed to update status', type: 'error' });
         }
     };
 
@@ -207,6 +209,7 @@ const DeliveryStaffActive = () => {
                     </div>
                 )}
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

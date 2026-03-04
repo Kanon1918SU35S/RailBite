@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { menuAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 /* ───────── Registry ───────── */
 const SECTIONS = [
@@ -32,6 +34,8 @@ const AdminMenuManagement = () => {
   const [saving, setSaving] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -133,42 +137,52 @@ const AdminMenuManagement = () => {
   useEffect(() => { clearSelection(); }, [activeSection, activeCategory, clearSelection]);
 
   /* ── Bulk actions ── */
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     const count = selectedIds.size;
     if (count === 0) return;
-    if (!window.confirm(`Delete ${count} item(s)? This cannot be undone.`)) return;
-    try {
-      setBulkLoading(true);
-      const token = localStorage.getItem('railbite_token');
-      const res = await menuAPI.bulkDelete([...selectedIds], token);
-      if (res.data.success) {
-        setMenuItems(prev => prev.filter(m => !selectedIds.has(m._id)));
-        clearSelection();
-        alert(`${res.data.deleted} item(s) deleted.`);
+    setConfirmModal({
+      message: `Delete ${count} item(s)? This cannot be undone.`,
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          setBulkLoading(true);
+          const token = localStorage.getItem('railbite_token');
+          const res = await menuAPI.bulkDelete([...selectedIds], token);
+          if (res.data.success) {
+            setMenuItems(prev => prev.filter(m => !selectedIds.has(m._id)));
+            clearSelection();
+            setToast({ message: `${res.data.deleted} item(s) deleted.`, type: 'success' });
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Bulk delete failed', type: 'error' });
+        } finally { setBulkLoading(false); }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Bulk delete failed');
-    } finally { setBulkLoading(false); }
+    });
   };
 
-  const handleBulkAvailability = async (available) => {
+  const handleBulkAvailability = (available) => {
     const count = selectedIds.size;
     if (count === 0) return;
     const action = available ? 'enable' : 'disable';
-    if (!window.confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} ${count} item(s)?`)) return;
-    try {
-      setBulkLoading(true);
-      const token = localStorage.getItem('railbite_token');
-      const res = await menuAPI.bulkToggleAvailability([...selectedIds], available, token);
-      if (res.data.success) {
-        const updatedMap = {};
-        (res.data.data || []).forEach(item => { updatedMap[item._id] = item; });
-        setMenuItems(prev => prev.map(m => updatedMap[m._id] ? updatedMap[m._id] : m));
-        alert(`${res.data.modified} item(s) ${action}d.`);
+    setConfirmModal({
+      message: `${action.charAt(0).toUpperCase() + action.slice(1)} ${count} item(s)?`,
+      type: 'warning',
+      onConfirm: async () => {
+        try {
+          setBulkLoading(true);
+          const token = localStorage.getItem('railbite_token');
+          const res = await menuAPI.bulkToggleAvailability([...selectedIds], available, token);
+          if (res.data.success) {
+            const updatedMap = {};
+            (res.data.data || []).forEach(item => { updatedMap[item._id] = item; });
+            setMenuItems(prev => prev.map(m => updatedMap[m._id] ? updatedMap[m._id] : m));
+            setToast({ message: `${res.data.modified} item(s) ${action}d.`, type: 'success' });
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Bulk update failed', type: 'error' });
+        } finally { setBulkLoading(false); }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Bulk update failed');
-    } finally { setBulkLoading(false); }
+    });
   };
 
   const selectEntireSection = () => {
@@ -204,18 +218,18 @@ const AdminMenuManagement = () => {
         const res = await menuAPI.update(editingItem._id, fd, token);
         if (res.data.success) {
           setMenuItems(prev => prev.map(item => item._id === editingItem._id ? res.data.data : item));
-          alert('Menu item updated successfully.');
+          setToast({ message: 'Menu item updated successfully.', type: 'success' });
         }
       } else {
         const res = await menuAPI.create(fd, token);
         if (res.data.success) {
           setMenuItems(prev => [res.data.data, ...prev]);
-          alert('Menu item added successfully.');
+          setToast({ message: 'Menu item added successfully.', type: 'success' });
         }
       }
       resetForm();
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to save item');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to save item', type: 'error' });
     } finally { setSaving(false); }
   };
 
@@ -234,18 +248,23 @@ const AdminMenuManagement = () => {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (item) => {
-    if (!window.confirm(`Delete "${item.name}"? This cannot be undone.`)) return;
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await menuAPI.delete(item._id, token);
-      if (res.data.success) {
-        setMenuItems(prev => prev.filter(m => m._id !== item._id));
-        alert('Menu item deleted.');
+  const handleDelete = (item) => {
+    setConfirmModal({
+      message: `Delete "${item.name}"? This cannot be undone.`,
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await menuAPI.delete(item._id, token);
+          if (res.data.success) {
+            setMenuItems(prev => prev.filter(m => m._id !== item._id));
+            setToast({ message: 'Menu item deleted.', type: 'success' });
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to delete', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to delete');
-    }
+    });
   };
 
   const toggleAvailability = async (item) => {
@@ -256,7 +275,7 @@ const AdminMenuManagement = () => {
         setMenuItems(prev => prev.map(m => m._id === item._id ? res.data.data : m));
       }
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to toggle availability');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to toggle availability', type: 'error' });
     }
   };
 
@@ -562,6 +581,15 @@ const AdminMenuManagement = () => {
           </div>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

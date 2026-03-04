@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { orderAPI } from '../services/api';
 import useSocket from '../hooks/useSocket';
 
@@ -13,6 +14,7 @@ function OrderTracking() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   // Real-time WebSocket connection
   const { socket, isConnected, joinOrder, leaveOrder } = useSocket();
@@ -103,22 +105,27 @@ function OrderTracking() {
     }
   };
 
-  const handleCancelOrder = async () => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) return;
-    try {
-      const token = localStorage.getItem('railbiteToken');
-      const res = await orderAPI.cancel(order.orderNumber, token);
-      if (res.data.success) {
-        setOrder(res.data.data);
-        setToast({ message: 'Order cancelled successfully', type: 'success' });
-        setTimeout(() => navigate('/order-history'), 2000);
+  const handleCancelOrder = () => {
+    setConfirmModal({
+      message: 'Are you sure you want to cancel this order?',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbiteToken');
+          const res = await orderAPI.cancel(order.orderNumber, token);
+          if (res.data.success) {
+            setOrder(res.data.data);
+            setToast({ message: 'Order cancelled successfully', type: 'success' });
+            setTimeout(() => navigate('/order-history'), 2000);
+          }
+        } catch (err) {
+          setToast({
+            message: err.response?.data?.message || 'Order cannot be cancelled at this stage',
+            type: 'error'
+          });
+        }
       }
-    } catch (err) {
-      setToast({
-        message: err.response?.data?.message || 'Order cannot be cancelled at this stage',
-        type: 'error'
-      });
-    }
+    });
   };
 
   const getStatusIndex = (status) =>
@@ -414,6 +421,14 @@ function OrderTracking() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 import { couponAPI } from '../services/api';
 import '../styles/admin.css';
 import '../styles/admin-menu.css';
@@ -37,6 +38,7 @@ const AdminCouponManagement = () => {
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState(null);
     const [toast, setToast] = useState(null);
+    const [confirmModal, setConfirmModal] = useState(null);
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('all');
     const [form, setForm] = useState(EMPTY_FORM);
@@ -167,16 +169,21 @@ const AdminCouponManagement = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this coupon?')) return;
-        try {
-            await couponAPI.delete(id, token);
-            setToast({ message: 'Coupon deleted', type: 'success' });
-            fetchCoupons();
-            fetchStats();
-        } catch (err) {
-            setToast({ message: err.response?.data?.message || 'Failed to delete', type: 'error' });
-        }
+    const handleDelete = (id) => {
+        setConfirmModal({
+            message: 'Are you sure you want to delete this coupon?',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    await couponAPI.delete(id, token);
+                    setToast({ message: 'Coupon deleted', type: 'success' });
+                    fetchCoupons();
+                    fetchStats();
+                } catch (err) {
+                    setToast({ message: err.response?.data?.message || 'Failed to delete', type: 'error' });
+                }
+            }
+        });
     };
 
     const handleToggleActive = async (coupon) => {
@@ -564,6 +571,14 @@ const AdminCouponManagement = () => {
             </div>
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+            {confirmModal && (
+                <ConfirmModal
+                    message={confirmModal.message}
+                    type={confirmModal.type}
+                    onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
         </div>
     );
 };

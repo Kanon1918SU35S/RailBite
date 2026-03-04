@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { contactAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminContactMessages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   useEffect(() => {
     fetchMessages();
@@ -40,21 +44,26 @@ const AdminContactMessages = () => {
         );
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update status');
+      setToast({ message: err.response?.data?.message || 'Failed to update status', type: 'error' });
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this message?')) return;
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await contactAPI.delete(id, token);
-      if (res.data.success) {
-        setMessages(prev => prev.filter(m => m._id !== id));
+  const handleDelete = (id) => {
+    setConfirmModal({
+      message: 'Delete this message?',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await contactAPI.delete(id, token);
+          if (res.data.success) {
+            setMessages(prev => prev.filter(m => m._id !== id));
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || 'Failed to delete message', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete message');
-    }
+    });
   };
 
   const filteredMessages = messages.filter(m => {
@@ -272,6 +281,15 @@ const AdminContactMessages = () => {
           </div>
         </div>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

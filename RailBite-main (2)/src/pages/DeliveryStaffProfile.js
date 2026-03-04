@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DeliveryStaffSidebar from '../components/DeliveryStaffSidebar';
 import { useDeliveryStaff } from '../context/DeliveryStaffContext';
 import { deliveryPortalAPI } from '../services/api';
+import Toast from '../components/Toast';
 
 const DeliveryStaffProfile = () => {
     const { staffUser, getToken, staffLoginSuccess } = useDeliveryStaff();
@@ -11,6 +12,7 @@ const DeliveryStaffProfile = () => {
     const [error, setError] = useState(null);
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [toast, setToast] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         phone: ''
@@ -55,10 +57,10 @@ const DeliveryStaffProfile = () => {
             if (res.data.success) {
                 setProfile(res.data.data);
                 setEditing(false);
-                alert('Profile updated successfully!');
+                setToast({ message: 'Profile updated successfully!', type: 'success' });
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to update profile');
+            setToast({ message: err.response?.data?.message || 'Failed to update profile', type: 'error' });
         } finally {
             setSaving(false);
         }
@@ -212,6 +214,7 @@ const DeliveryStaffProfile = () => {
                     </div>
                 </div>
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

@@ -3,6 +3,7 @@ import DeliveryStaffSidebar from '../components/DeliveryStaffSidebar';
 import { useDeliveryStaff } from '../context/DeliveryStaffContext';
 import { deliveryPortalAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const DeliveryStaffDashboard = () => {
     const { staffUser, getToken } = useDeliveryStaff();
@@ -12,6 +13,7 @@ const DeliveryStaffDashboard = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [toast, setToast] = useState(null);
 
     useEffect(() => {
         fetchDashboardData();
@@ -124,7 +126,7 @@ const DeliveryStaffDashboard = () => {
                 fetchDashboardData();
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to update status');
+            setToast({ message: err.response?.data?.message || 'Failed to update status', type: 'error' });
         }
     };
 
@@ -268,6 +270,7 @@ const DeliveryStaffDashboard = () => {
                     </div>
                 </div>
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

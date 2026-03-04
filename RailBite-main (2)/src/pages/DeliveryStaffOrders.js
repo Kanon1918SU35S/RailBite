@@ -3,6 +3,7 @@ import DeliveryStaffSidebar from '../components/DeliveryStaffSidebar';
 import { useDeliveryStaff } from '../context/DeliveryStaffContext';
 import { deliveryPortalAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const DeliveryStaffOrders = () => {
     const { getToken } = useDeliveryStaff();
@@ -13,6 +14,7 @@ const DeliveryStaffOrders = () => {
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [toast, setToast] = useState(null);
 
     useEffect(() => {
         fetchOrders();
@@ -73,7 +75,7 @@ const DeliveryStaffOrders = () => {
                 fetchOrders();
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to update status');
+            setToast({ message: err.response?.data?.message || 'Failed to update status', type: 'error' });
         }
     };
 
@@ -212,6 +214,7 @@ const DeliveryStaffOrders = () => {
                     </div>
                 )}
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

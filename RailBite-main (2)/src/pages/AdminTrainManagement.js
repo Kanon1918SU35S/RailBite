@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { trainAPI } from '../services/api';
 import AdminSidebar from '../components/AdminSidebar';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function AdminTrainManagement() {
     const [trains, setTrains] = useState([]);
@@ -26,6 +27,7 @@ export default function AdminTrainManagement() {
     });
     const [msg, setMsg] = useState('');
     const [msgType, setMsgType] = useState('success');
+    const [confirmModal, setConfirmModal] = useState(null);
 
     useEffect(() => {
         fetchTrains();
@@ -133,20 +135,25 @@ export default function AdminTrainManagement() {
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Delete this train? This action cannot be undone.')) return;
-        try {
-            const token = localStorage.getItem('railbite_token');
-            await trainAPI.delete(id, token);
-            setMsg('Train deleted successfully');
-            setMsgType('success');
-            fetchTrains();
-        } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Error deleting train';
-            setMsg(errorMsg);
-            setMsgType('error');
-            console.error('Error deleting train:', err);
-        }
+    const handleDelete = (id) => {
+        setConfirmModal({
+            message: 'Delete this train? This action cannot be undone.',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    const token = localStorage.getItem('railbite_token');
+                    await trainAPI.delete(id, token);
+                    setMsg('Train deleted successfully');
+                    setMsgType('success');
+                    fetchTrains();
+                } catch (err) {
+                    const errorMsg = err.response?.data?.message || 'Error deleting train';
+                    setMsg(errorMsg);
+                    setMsgType('error');
+                    console.error('Error deleting train:', err);
+                }
+            }
+        });
     };
 
     const addStation = () => {
@@ -348,6 +355,14 @@ export default function AdminTrainManagement() {
                     </div>
                 )}
             </div>
+            {confirmModal && (
+                <ConfirmModal
+                    message={confirmModal.message}
+                    type={confirmModal.type}
+                    onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
         </div>
     );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import { notificationAPI } from '../services/api';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminNotifications = () => {
   const [activeTab, setActiveTab] = useState('my'); // 'my' or 'manage'
@@ -18,6 +19,7 @@ const AdminNotifications = () => {
   const [manageError, setManageError] = useState(null);
   const [sending, setSending] = useState(false);
   const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
     type: 'promotion',
@@ -144,17 +146,22 @@ const AdminNotifications = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this notification?')) return;
-    try {
-      const token = getToken();
-      const res = await notificationAPI.delete(id, token);
-      if (res.data.success) {
-        setAllNotifications(prev => prev.filter(n => n._id !== id));
+  const handleDelete = (id) => {
+    setConfirmModal({
+      message: 'Delete this notification?',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = getToken();
+          const res = await notificationAPI.delete(id, token);
+          if (res.data.success) {
+            setAllNotifications(prev => prev.filter(n => n._id !== id));
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to delete', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to delete');
-    }
+    });
   };
 
   // --- Helpers ---
@@ -554,6 +561,14 @@ const AdminNotifications = () => {
           </>
         )}
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

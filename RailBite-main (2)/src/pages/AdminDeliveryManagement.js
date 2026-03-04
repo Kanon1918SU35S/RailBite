@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { deliveryStaffAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminDeliveryManagement = () => {
   const [deliveryStaff, setDeliveryStaff] = useState([]);
@@ -10,6 +12,8 @@ const AdminDeliveryManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -64,18 +68,18 @@ const AdminDeliveryManagement = () => {
           setDeliveryStaff(prev =>
             prev.map(s => s._id === editingStaff._id ? res.data.data : s)
           );
-          alert('Staff updated successfully.');
+          setToast({ message: 'Staff updated successfully.', type: 'success' });
         }
       } else {
         const res = await deliveryStaffAPI.create(formData, token);
         if (res.data.success) {
           setDeliveryStaff(prev => [res.data.data, ...prev]);
-          alert('Staff added successfully.');
+          setToast({ message: 'Staff added successfully.', type: 'success' });
         }
       }
       resetForm();
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to save staff');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to save staff', type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -93,18 +97,23 @@ const AdminDeliveryManagement = () => {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (staff) => {
-    if (!window.confirm(`Delete "${staff.name}"? This cannot be undone.`)) return;
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await deliveryStaffAPI.delete(staff._id, token);
-      if (res.data.success) {
-        setDeliveryStaff(prev => prev.filter(s => s._id !== staff._id));
-        alert('Staff deleted.');
+  const handleDelete = (staff) => {
+    setConfirmModal({
+      message: `Delete "${staff.name}"? This cannot be undone.`,
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await deliveryStaffAPI.delete(staff._id, token);
+          if (res.data.success) {
+            setDeliveryStaff(prev => prev.filter(s => s._id !== staff._id));
+            setToast({ message: 'Staff deleted.', type: 'success' });
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to delete', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to delete');
-    }
+    });
   };
 
   const resetForm = () => {
@@ -380,6 +389,15 @@ const AdminDeliveryManagement = () => {
           </div>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

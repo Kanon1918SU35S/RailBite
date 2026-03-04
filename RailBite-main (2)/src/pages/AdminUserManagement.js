@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { userAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -11,6 +13,8 @@ const AdminUserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -72,19 +76,19 @@ const AdminUserManagement = () => {
           setUsers(prev =>
             prev.map(u => u._id === editingUser._id ? res.data.data : u)
           );
-          alert('User updated successfully.');
+          setToast({ message: 'User updated successfully.', type: 'success' });
         }
       } else {
         const res = await userAPI.create(formData, token);
         if (res.data.success) {
           setUsers(prev => [res.data.data, ...prev]);
-          alert('User created successfully. Default password: railbite123');
+          setToast({ message: 'User created successfully. Default password: railbite123', type: 'success' });
         }
       }
 
       resetForm();
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to save user');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to save user', type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -102,19 +106,23 @@ const AdminUserManagement = () => {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (user) => {
-    if (!window.confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
-
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await userAPI.delete(user._id, token);
-      if (res.data.success) {
-        setUsers(prev => prev.filter(u => u._id !== user._id));
-        alert('User deleted.');
+  const handleDelete = (user) => {
+    setConfirmModal({
+      message: `Delete user "${user.name}"? This cannot be undone.`,
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await userAPI.delete(user._id, token);
+          if (res.data.success) {
+            setUsers(prev => prev.filter(u => u._id !== user._id));
+            setToast({ message: 'User deleted.', type: 'success' });
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to delete user', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to delete user');
-    }
+    });
   };
 
   const handleToggleStatus = async (user) => {
@@ -127,7 +135,7 @@ const AdminUserManagement = () => {
         );
       }
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to toggle status');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to toggle status', type: 'error' });
     }
   };
 
@@ -435,6 +443,15 @@ const AdminUserManagement = () => {
           </div>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

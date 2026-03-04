@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { orderAPI, deliveryStaffAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminOrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -14,6 +16,8 @@ const AdminOrderManagement = () => {
   const [selectedStaff, setSelectedStaff] = useState('');
   const [assigning, setAssigning] = useState(false);
   const [staffLoading, setStaffLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   // Assignment stats
   const [assignStats, setAssignStats] = useState(null);
@@ -52,37 +56,46 @@ const AdminOrderManagement = () => {
     fetchStats();
   }, [fetchOrders, fetchStats]);
 
-  const handleStatusUpdate = async (order, newStatus) => {
+  const handleStatusUpdate = (order, newStatus) => {
     const statusLabels = {
       confirmed: 'confirm',
       preparing: 'mark as preparing',
       on_the_way: 'dispatch'
     };
 
-    if (!window.confirm(`Are you sure you want to ${statusLabels[newStatus]} order #${order.orderNumber}?`)) return;
-
-    try {
-      const res = await orderAPI.updateStatus(order._id, { status: newStatus }, token);
-      if (res.data.success) {
-        setOrders(prev => prev.map(o => o._id === order._id ? res.data.data : o));
-        fetchStats();
+    setConfirmModal({
+      message: `Are you sure you want to ${statusLabels[newStatus]} order #${order.orderNumber}?`,
+      type: 'warning',
+      onConfirm: async () => {
+        try {
+          const res = await orderAPI.updateStatus(order._id, { status: newStatus }, token);
+          if (res.data.success) {
+            setOrders(prev => prev.map(o => o._id === order._id ? res.data.data : o));
+            fetchStats();
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to update order status', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to update order status');
-    }
+    });
   };
 
-  const handleCancelOrder = async (order) => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) return;
-    try {
-      const res = await orderAPI.updateStatus(order._id, { status: 'cancelled' }, token);
-      if (res.data.success) {
-        setOrders(prev => prev.map(o => o._id === order._id ? res.data.data : o));
-        fetchStats();
+  const handleCancelOrder = (order) => {
+    setConfirmModal({
+      message: 'Are you sure you want to cancel this order?',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const res = await orderAPI.updateStatus(order._id, { status: 'cancelled' }, token);
+          if (res.data.success) {
+            setOrders(prev => prev.map(o => o._id === order._id ? res.data.data : o));
+            fetchStats();
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || err.message || 'Failed to cancel', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to cancel');
-    }
+    });
   };
 
   // ── Assignment modal ──
@@ -94,7 +107,7 @@ const AdminOrderManagement = () => {
       const res = await deliveryStaffAPI.getAvailable(token);
       if (res.data.success) setAvailableStaff(res.data.data || []);
     } catch (err) {
-      alert('Failed to load delivery staff');
+      setToast({ message: 'Failed to load delivery staff', type: 'error' });
     } finally {
       setStaffLoading(false);
     }
@@ -117,7 +130,7 @@ const AdminOrderManagement = () => {
         fetchStats();
       }
     } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to assign staff');
+      setToast({ message: err.response?.data?.message || err.message || 'Failed to assign staff', type: 'error' });
     } finally {
       setAssigning(false);
     }
@@ -512,6 +525,15 @@ const AdminOrderManagement = () => {
           </div>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };

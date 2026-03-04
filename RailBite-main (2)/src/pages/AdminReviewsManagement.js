@@ -1,6 +1,8 @@
 ﻿import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { reviewAPI } from '../services/api';
+import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminReviewsManagement = () => {
   const [reviews, setReviews] = useState([]);
@@ -9,6 +11,8 @@ const AdminReviewsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRating, setFilterRating] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [toast, setToast] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   useEffect(() => {
     loadReviews();
@@ -51,17 +55,22 @@ const AdminReviewsManagement = () => {
     });
   }, [reviews, searchQuery, filterRating, filterStatus]);
 
-  const deleteReview = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this review?')) return;
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await reviewAPI.delete(id, token);
-      if (res.data.success) {
-        setReviews(prev => prev.filter(r => r._id !== id));
+  const deleteReview = (id) => {
+    setConfirmModal({
+      message: 'Are you sure you want to delete this review?',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await reviewAPI.delete(id, token);
+          if (res.data.success) {
+            setReviews(prev => prev.filter(r => r._id !== id));
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || 'Failed to delete review', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete review');
-    }
+    });
   };
 
   const approveReview = async (id) => {
@@ -72,21 +81,26 @@ const AdminReviewsManagement = () => {
         setReviews(prev => prev.map(r => r._id === id ? { ...r, status: 'approved', isApproved: true } : r));
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to approve review');
+      setToast({ message: err.response?.data?.message || 'Failed to approve review', type: 'error' });
     }
   };
 
-  const rejectReview = async (id) => {
-    if (!window.confirm('Are you sure you want to reject this review?')) return;
-    try {
-      const token = localStorage.getItem('railbite_token');
-      const res = await reviewAPI.reject(id, token);
-      if (res.data.success) {
-        setReviews(prev => prev.map(r => r._id === id ? { ...r, status: 'rejected', isApproved: false } : r));
+  const rejectReview = (id) => {
+    setConfirmModal({
+      message: 'Are you sure you want to reject this review?',
+      type: 'warning',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('railbite_token');
+          const res = await reviewAPI.reject(id, token);
+          if (res.data.success) {
+            setReviews(prev => prev.map(r => r._id === id ? { ...r, status: 'rejected', isApproved: false } : r));
+          }
+        } catch (err) {
+          setToast({ message: err.response?.data?.message || 'Failed to reject review', type: 'error' });
+        }
       }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to reject review');
-    }
+    });
   };
 
   const getStars = (rating) => {
@@ -315,6 +329,15 @@ const AdminReviewsManagement = () => {
           </div>
         </div>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          type={confirmModal.type}
+          onConfirm={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 };
